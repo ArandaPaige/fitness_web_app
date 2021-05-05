@@ -52,6 +52,37 @@ class WeightEntry:
             return value
 
 
+class LiftEntry(WeightEntry):
+    """Define"""
+
+    def __init__(self, date, weight, reps):
+        super().__init__(date, weight)
+        self.date = date
+        self.weight = weight
+        self.reps = reps
+        self.collection = ()
+
+    def __str__(self):
+        return f'(Date: {self.date} | Weight: {self.weight} | Reps: {self.reps})'
+
+    def __repr__(self):
+        return f'{__class__.__name__}({self.date}, {self.weight}, {self.reps})'
+
+    def calculate_percentage_of_1_rep_max(self):
+        one_rep_max = self.weight / (1.0278 - 0.0278 * self.reps)
+        percentage = self.weight / one_rep_max
+        return percentage, one_rep_max
+
+    def calculate_volume(self):
+        volume = self.weight * self.reps
+        return volume
+
+    @staticmethod
+    def calculate_total_volume(*args):
+        total_volume = sum(x for x in args)
+        return total_volume
+
+
 class WeightHistory:
     """Define"""
 
@@ -81,34 +112,8 @@ class WeightHistory:
         net_change = abs(self.list[start_val] - self.list[end_val])
         return net_change
 
-    def calculate_time_to_goal(self, date, start_val, goal_val):
+    def calculate_time_to_goal(self, start_val, goal_val, delta):
         pass
-
-
-class LiftEntry(WeightEntry):
-    """Define"""
-
-    def __init__(self, date, weight, reps):
-        super().__init__(date, weight)
-        self.date = date
-        self.weight = weight
-        self.reps = reps
-        self.collection = ()
-
-    def __str__(self):
-        return f'(Date: {self.date} | Weight: {self.weight} | Reps: {self.reps})'
-
-    def __repr__(self):
-        return f'{__class__.__name__}({self.date}, {self.weight}, {self.reps})'
-
-    def calculate_volume(self, lift_set):
-        volume = lift_set * self.reps
-        return volume
-
-    def calculate_percentage_of_1_rep_max(self):
-        one_rep_max = self.weight / (1.0278 - 0.0278 * self.reps)
-        percentage = self.weight / one_rep_max
-        return percentage, one_rep_max
 
 
 class LiftHistory(WeightHistory):
