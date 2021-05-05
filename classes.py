@@ -1,3 +1,8 @@
+import datetime
+
+TODAY = datetime.date.today()
+
+
 class User:
     """Define"""
 
@@ -15,9 +20,9 @@ class User:
 class WeightEntry:
     """Define"""
 
-    def __init__(self, weight, date):
-        self.weight = weight
+    def __init__(self, date, weight):
         self.date = date
+        self.weight = weight
         self.collection = ()
 
     def __str__(self):
@@ -25,6 +30,12 @@ class WeightEntry:
 
     def __repr__(self):
         return f'{__class__.__name__}({self.weight}, {self.date}'
+
+    def date_validation(self):
+        pass
+
+    def number_validation(self):
+        pass
 
 
 class WeightHistory:
@@ -43,35 +54,48 @@ class WeightHistory:
         sorted_list = sorted(self.list)
         return sorted_list
 
-    def calculate_delta(self, start_date, end_date):
-        pass
+    def calculate_delta(self, start_val, end_val, start_date, end_date):
+        time_delta = self.list[end_date] - self.list[start_date]
+        weight = self.list[start_val] - self.list[end_val]
+        if weight <= 0:
+            delta = weight / time_delta.days
+        else:
+            delta = -(weight / time_delta.days)
+        return delta
 
-    def calculate_net_change(self, entry1, entry2):
-        pass
+    def calculate_net_change(self, start_val, end_val):
+        net_change = abs(self.list[start_val] - self.list[end_val])
+        return net_change
 
-    def calculate_end_date(self):
+    def calculate_time_to_goal(self, date, start_val, goal_val):
         pass
 
 
 class LiftEntry(WeightEntry):
     """Define"""
 
-    def __init__(self, date, sets, reps):
-        super().__init__(sets, reps)
+    def __init__(self, date, weight, lift_set, reps):
+        super().__init__(lift_set, reps)
         self.date = date
-        self.sets = sets
+        self.weight = weight
+        self.set = lift_set
         self.reps = reps
         self.collection = ()
 
     def __str__(self):
-        return f'({self.date}, {self.sets}, {self.reps})'
+        return f'({self.date}, {self.weight}, {self.set}, {self.reps})'
 
     def __repr__(self):
-        return f'{__class__.__name__}({self.date}, {self.sets}, {self.reps})'
+        return f'{__class__.__name__}({self.date}, {self.weight}, {self.set}, {self.reps})'
 
     def calculate_volume(self):
-        volume = self.sets * self.reps
+        volume = self.set * self.reps
         return volume
+
+    def calculate_percentage_of_1_rep_max(self):
+        one_rep_max = self.weight / (1.0278 - 0.0278 * self.reps)
+        percentage = self.weight / one_rep_max
+        return percentage, one_rep_max
 
 
 class LiftHistory(WeightHistory):
@@ -87,4 +111,3 @@ class LiftHistory(WeightHistory):
 
     def __repr__(self):
         return f'{__class__.__name__}({self.lift})'
-
