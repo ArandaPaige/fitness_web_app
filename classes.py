@@ -1,4 +1,7 @@
+import logging
 import datetime
+
+logger = logging.getLogger(__name__)
 
 TODAY = datetime.date.today()
 
@@ -31,11 +34,22 @@ class WeightEntry:
     def __repr__(self):
         return f'{__class__.__name__}({self.weight}, {self.date}'
 
-    def date_validation(self):
-        pass
+    @staticmethod
+    def date_validation(date):
+        try:
+            date = datetime.date.strftime(date, '%YY-%MM-%DD')
+        except ValueError:
+            logger.exception('Value error raised.')
+            raise ValueError
+        return date
 
-    def number_validation(self):
-        pass
+    @staticmethod
+    def value_validation(value):
+        if not (isinstance(value, int) or isinstance(value, float)):
+            logger.exception('Type error raised.')
+            raise TypeError
+        else:
+            return value
 
 
 class WeightHistory:
