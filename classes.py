@@ -3,7 +3,7 @@ import datetime
 
 logger = logging.getLogger(__name__)
 
-TODAY = datetime.date.today()
+DATETODAY = datetime.date.today()
 
 
 class User:
@@ -36,6 +36,7 @@ class WeightEntry:
 
     @staticmethod
     def date_validation(date):
+        """Validates date parameter if it matches ISO format and raises ValueError if it does not."""
         try:
             date = datetime.date.strftime(date, '%Y-%m-%d')
         except ValueError:
@@ -45,6 +46,7 @@ class WeightEntry:
 
     @staticmethod
     def value_validation(value):
+        """Validates value parameter as being an instance of either int or float and raises TypeError if not."""
         if not (isinstance(value, int) or isinstance(value, float)):
             logger.exception('Type error raised.')
             raise TypeError
@@ -52,7 +54,7 @@ class WeightEntry:
             return value
 
 
-class LiftEntry(WeightEntry):
+class SetEntry(WeightEntry):
     """Define"""
 
     def __init__(self, date, weight, reps):
@@ -60,6 +62,8 @@ class LiftEntry(WeightEntry):
         self.date = date
         self.weight = weight
         self.reps = reps
+        self.RPE = None
+        self.volume = None
         self.collection = ()
 
     def __str__(self):
@@ -77,10 +81,24 @@ class LiftEntry(WeightEntry):
         volume = self.weight * self.reps
         return volume
 
-    @staticmethod
-    def calculate_total_volume(*args):
-        total_volume = sum(x for x in args)
-        return total_volume
+
+class SetsEntry:
+    """Define"""
+
+    def __init__(self, date, *set_objs):
+        self.date = date
+        self.sets = len(set_objs)
+        self.set_list = set_objs
+        self.volume = None
+
+    def __str__(self):
+        return f'(Date: {self.date} | Sets: {self.sets})'
+
+    def __repr__(self):
+        return f'{__class__.__name__}({self.date}, {self.sets})'
+
+    def calculate_volume(self):
+        self.volume = sum(x for x in self.sets)
 
 
 class WeightHistory:
@@ -95,8 +113,8 @@ class WeightHistory:
     def __repr__(self):
         return f'{__class__.__name__}({self.list})'
 
-    def sort(self, reverse=False):
-        sorted_list = sorted(self.list, key=lambda x: x[0], reverse=reverse)
+    def sort(self, key=lambda x: x[0], reverse=False):
+        sorted_list = sorted(self.list, key=key, reverse=reverse)
         return sorted_list
 
     def calculate_delta(self, start_val, end_val, start_date, end_date):
@@ -113,7 +131,10 @@ class WeightHistory:
         return net_change
 
     def calculate_time_to_goal(self, start_val, goal_val, delta):
-        pass
+        diff = self.list[start_val] - goal_val
+        days = abs(int(diff / delta))
+        end_date = DATETODAY + datetime.timedelta(days=days)
+        return days, end_date
 
 
 class LiftHistory(WeightHistory):
