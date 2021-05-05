@@ -97,8 +97,16 @@ class SetsEntry:
     def __repr__(self):
         return f'{__class__.__name__}({self.date}, {self.sets})'
 
+    def average_rpe(self):
+        average = int((sum(obj.getattr(obj, 'RPE', 0) for obj in self.set_list)) / self.sets)
+        return average
+
+    def calculate_total_reps(self):
+        total = sum(obj.getattr(obj, 'reps', 0) for obj in self.set_list)
+        return total
+
     def calculate_volume(self):
-        self.volume = sum(x for x in self.sets)
+        self.volume = sum(obj.getattr(obj, 'volume', 0) for obj in self.set_list)
 
 
 class WeightHistory:
@@ -150,3 +158,23 @@ class LiftHistory(WeightHistory):
 
     def __repr__(self):
         return f'{__class__.__name__}({self.lift}, {self.list})'
+
+
+class DateEntry:
+    """Define"""
+
+    def __init__(self, year, month, day):
+        self.year = year
+        self.month = month
+        self.day = day
+
+    def date_validation(self):
+        """Validates date parameter if it matches ISO format and raises ValueError if it does not."""
+        date = '-'.join((self.year, self.month, self.day))
+        try:
+            date_obj = datetime.date.strftime(date, '%Y-%m-%d')
+        except ValueError:
+            logger.exception('Value error raised.')
+            raise ValueError
+        else:
+            return date_obj
