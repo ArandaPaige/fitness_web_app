@@ -43,17 +43,18 @@ class WeightHistory:
         sorted_list = sorted(self.list)
         return sorted_list
 
-    def calculate_delta(self):
+    def calculate_delta(self, start_date, end_date):
         pass
 
-    def calculate_net_change(self):
+    def calculate_net_change(self, entry1, entry2):
         pass
 
 
-class LiftEntry:
+class LiftEntry(WeightEntry):
     """Define"""
 
     def __init__(self, date, sets, reps):
+        super().__init__(sets, reps)
         self.date = date
         self.sets = sets
         self.reps = reps
@@ -73,13 +74,14 @@ class LiftEntry:
 class LiftHistory(WeightHistory):
     """Define"""
 
-    def __init__(self, lift_list=None):
-        super().__init__(lift_list)
-        self.lift_list = lift_list
+    def __init__(self, lift, lift_list=None):
+        super().__init__(lift)
+        self.lift = lift
+        self.list = lift_list
 
     def __str__(self):
-        return f'({self.lift_list})'
+        return f'({self.lift})'
 
     def __repr__(self):
-        return f'{__class__.__name__}({self.lift_list})'
+        return f'{__class__.__name__}({self.lift})'
 
