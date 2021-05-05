@@ -49,6 +49,9 @@ class WeightHistory:
     def calculate_net_change(self, entry1, entry2):
         pass
 
+    def calculate_end_date(self):
+        pass
+
 
 class LiftEntry(WeightEntry):
     """Define"""
