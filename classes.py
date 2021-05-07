@@ -18,16 +18,42 @@ class User(db_class):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(length=150), nullable=False)
+    email = Column(String(length=150,), index=True, unique=True)
+    username = Column(String(length=150), nullable=False)
+    password = Column(String(length=128))
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, username, email):
+        self.username = username
+        self.email = email
 
     def __str__(self):
         return f'(Name: {self.name})'
 
     def __repr__(self):
         return f'{__class__.__name__}({self.name})'
+
+    def validate_username(self):
+        error = None
+        if not isinstance(self.username, str):
+            try:
+                self.username = str(self.username)
+            except ValueError:
+                logger.exception('Value error encountered')
+                error = f'Cannot convert {self.username} to username format.'
+        if error:
+            return error
+
+    def validate_email(self):
+        error = None
+        if not isinstance(self.email, str):
+            try:
+                self.email = str(self.email)
+            except ValueError:
+                logger.exception('Value error encountered.')
+                error = f'Cannot convert {self.email} provided to email format.'
+        prefix, domain = self.email.split('@', 1)
+        if error:
+            return error
 
 
 class WeightEntry(db_class):
@@ -42,7 +68,7 @@ class WeightEntry(db_class):
     user = relationship(User)
 
     def __init__(self, date, weight):
-        self.date = date
+        self.date = DateEntry(date)
         self.weight = weight
 
     def __str__(self):
@@ -55,9 +81,8 @@ class WeightEntry(db_class):
     def value_validation(value):
         """Validates value parameter as being an instance of either int or float and raises TypeError if not."""
         if not (isinstance(value, int) or isinstance(value, float)):
-            logger.exception('Type error raised.')
-            raise TypeError
-        return
+            logger.exception('Type error encountered.')
+        return value
 
     @staticmethod
     def sort(obj_list, key=lambda x: x[0], reverse=False):
@@ -100,11 +125,11 @@ class SetEntry(WeightEntry):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     date = Column(Date, nullable=False)
-    lift = Column(String, nullable=False)
+    lift = Column(String(length=30), nullable=False)
     weight = Column(Float(precision=2), nullable=False)
     reps = Column(Integer, nullable=False)
     volume = Column(Integer, nullable=False)
-    rpe = Column(Float, nullable=True)
+    rpe = Column(Float(precision=1), nullable=True)
     user = relationship(User)
 
     __mapper_args__ = {
@@ -174,7 +199,11 @@ class DateEntry:
         return f'{__class__.__name__}({self.date})'
 
     def validate(self):
-        pass
+        if not (isinstance(self.date, datetime.date)):
+            try:
+                self.date = datetime.datetime.strptime(self.date, '%Y-%m-%d')
+            except ValueError:
+                logger.exception('Value error encountered.')
 
     def format_date(self):
         """Validates date parameter if it matches ISO format and raises ValueError if it does not."""
@@ -182,7 +211,6 @@ class DateEntry:
         try:
             date_obj = datetime.datetime.strptime(date, '%Y-%m-%d')
         except ValueError:
-            logger.exception('Value error raised.')
-            raise ValueError
+            logger.exception('Value error encountered.')
         else:
             return date_obj
