@@ -2,8 +2,8 @@ import datetime
 import logging
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 logger = logging.getLogger(__name__)
 
@@ -60,12 +60,21 @@ class WeightEntry(db_class):
         return
 
     @staticmethod
-    def sort(weight_list, key=lambda x: x[0], reverse=False):
-        sorted_list = sorted(weight_list, key=key, reverse=reverse)
+    def sort(obj_list, key=lambda x: x[0], reverse=False):
+        """Sorts the list of objects by key, which defaults to date, in ascending order."""
+        sorted_list = sorted(obj_list, key=key, reverse=reverse)
         return sorted_list
 
     @staticmethod
+    def calculate_net_change(start_val, end_val):
+        """Subtracts end value from start value to determine net change and returns absolute float."""
+        net_change = abs(start_val - end_val)
+        return net_change
+
+    @staticmethod
     def calculate_delta(start_val, end_val, start_date, end_date):
+        """Calculates delta based on difference between starting value and end value and length of time between the
+        starting date and end date. Returns a float."""
         time_delta = end_date - start_date
         weight = start_val - end_val
         if weight <= 0:
@@ -75,14 +84,10 @@ class WeightEntry(db_class):
         return delta
 
     @staticmethod
-    def calculate_net_change(start_val, end_val):
-        net_change = abs(start_val - end_val)
-        return net_change
-
-    @staticmethod
     def calculate_time_to_goal(start_val, goal_val, delta):
-        diff = start_val - goal_val
-        days = abs(int(diff / delta))
+        """Calculates days until the goal value is reached and returns a tuple of days left and the date upon
+        which the goal will be achieved."""
+        days = abs((start_val - goal_val) / delta)
         end_date = DATETODAY + datetime.timedelta(days=days)
         return days, end_date
 
@@ -93,7 +98,7 @@ class SetEntry(WeightEntry):
     __tablename__ = 'lifting_history'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users'))
+    user_id = Column(Integer, ForeignKey('users.id'))
     date = Column(Date, nullable=False)
     lift = Column(String, nullable=False)
     weight = Column(Float(precision=2), nullable=False)
@@ -116,33 +121,40 @@ class SetEntry(WeightEntry):
         self.rpe = rpe
 
     def __str__(self):
-        return f'(Date: {self.date} | Weight: {self.weight} | Reps: {self.reps})'
+        return f'Date: {self.date} | Weight: {self.weight} | Reps: {self.reps} | RPE: {self.rpe}'
 
     def __repr__(self):
-        return f'{__class__.__name__}({self.date}, {self.weight}, {self.reps})'
+        return f'{__class__.__name__}({self.date}, {self.weight}, {self.reps}, {self.rpe})'
 
     def calculate_percentage_of_1_rep_max(self):
+        """Calculates one-rep max using Brzycki formula and returns tuple of one-rep max and percentage of
+        one-rep max based on the set.
+        """
         one_rep_max = self.weight / (1.0278 - 0.0278 * self.reps)
         percentage = self.weight / one_rep_max
         return percentage, one_rep_max
 
     def calculate_volume(self):
+        """Multiplies weight and reps to determine volume and returns an integer."""
         volume = self.weight * self.reps
         return volume
 
     @staticmethod
     def average_rpe(sets):
-        average = (sum(obj.getattr(obj, 'rpe', 0) for obj in sets)) / len(sets)
+        """Averages RPE for tuple of set objects and returns a float."""
+        average = (sum(set.getattr(set, 'rpe', 0) for set in sets)) / len(sets)
         return average
 
     @staticmethod
     def calculate_total_reps(sets):
-        total_reps = sum(obj.getattr(obj, 'reps', 0) for obj in sets)
+        """Sums reps for tuple of set objects and returns an integer."""
+        total_reps = sum(set.getattr(set, 'reps', 0) for set in sets)
         return total_reps
 
     @staticmethod
     def calculate_total_volume(sets):
-        total_volume = sum(obj.getattr(obj, 'volume', 0) for obj in sets)
+        """Sums volume for tuple of set objects and returns an integer."""
+        total_volume = sum(set.getattr(set, 'volume', 0) for set in sets)
         return total_volume
 
 
