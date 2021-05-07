@@ -1,6 +1,8 @@
 import datetime
 import logging
+
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 logger = logging.getLogger(__name__)
@@ -16,7 +18,7 @@ class User(db_class):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(length=100), nullable=False)
+    name = Column(String(length=150), nullable=False)
 
     def __init__(self, name):
         self.name = name
@@ -37,6 +39,7 @@ class WeightEntry(db_class):
     user_id = Column(Integer, ForeignKey('users.id'))
     date = Column(Date, nullable=False)
     weight = Column(Float(precision=2), nullable=False)
+    user = relationship(User)
 
     def __init__(self, date, weight):
         self.date = date
@@ -56,6 +59,33 @@ class WeightEntry(db_class):
             raise TypeError
         return
 
+    @staticmethod
+    def sort(weight_list, key=lambda x: x[0], reverse=False):
+        sorted_list = sorted(weight_list, key=key, reverse=reverse)
+        return sorted_list
+
+    @staticmethod
+    def calculate_delta(start_val, end_val, start_date, end_date):
+        time_delta = end_date - start_date
+        weight = start_val - end_val
+        if weight <= 0:
+            delta = weight / time_delta.days
+        else:
+            delta = -(weight / time_delta.days)
+        return delta
+
+    @staticmethod
+    def calculate_net_change(start_val, end_val):
+        net_change = abs(start_val - end_val)
+        return net_change
+
+    @staticmethod
+    def calculate_time_to_goal(start_val, goal_val, delta):
+        diff = start_val - goal_val
+        days = abs(int(diff / delta))
+        end_date = DATETODAY + datetime.timedelta(days=days)
+        return days, end_date
+
 
 class SetEntry(WeightEntry):
     """Define"""
@@ -65,21 +95,25 @@ class SetEntry(WeightEntry):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users'))
     date = Column(Date, nullable=False)
+    lift = Column(String, nullable=False)
     weight = Column(Float(precision=2), nullable=False)
     reps = Column(Integer, nullable=False)
-    volume = Column(Integer, nullable=True)
+    volume = Column(Integer, nullable=False)
+    rpe = Column(Float, nullable=True)
+    user = relationship(User)
 
     __mapper_args__ = {
         'concrete': True
     }
 
-    def __init__(self, date, weight, reps):
+    def __init__(self, lift, date, weight, reps, rpe=None):
         super().__init__(date, weight)
         self.date = DateEntry(date)
+        self.lift = lift
         self.weight = weight
         self.reps = reps
-        self.rpe = None
-        self.volume = None
+        self.volume = self.calculate_volume()
+        self.rpe = rpe
 
     def __str__(self):
         return f'(Date: {self.date} | Weight: {self.weight} | Reps: {self.reps})'
@@ -96,83 +130,20 @@ class SetEntry(WeightEntry):
         volume = self.weight * self.reps
         return volume
 
-
-class SetsEntry:
-    """Define"""
-
-    def __init__(self, date, *set_objs):
-        self.date = date
-        self.sets = len(set_objs)
-        self.set_list = set_objs
-        self.volume = None
-
-    def __str__(self):
-        return f'(Date: {self.date} | Sets: {self.sets})'
-
-    def __repr__(self):
-        return f'{__class__.__name__}({self.date}, {self.sets})'
-
-    def average_rpe(self):
-        average = (sum(obj.getattr(obj, 'rpe', 0) for obj in self.set_list)) / self.sets
+    @staticmethod
+    def average_rpe(sets):
+        average = (sum(obj.getattr(obj, 'rpe', 0) for obj in sets)) / len(sets)
         return average
 
-    def calculate_total_reps(self):
-        total = sum(obj.getattr(obj, 'reps', 0) for obj in self.set_list)
-        return total
+    @staticmethod
+    def calculate_total_reps(sets):
+        total_reps = sum(obj.getattr(obj, 'reps', 0) for obj in sets)
+        return total_reps
 
-    def calculate_volume(self):
-        self.volume = sum(obj.getattr(obj, 'volume', 0) for obj in self.set_list)
-
-
-class WeightHistory:
-    """Define"""
-
-    def __init__(self, weight_list=None):
-        self.list = weight_list
-
-    def __str__(self):
-        return f'(Weight History: {self.list})'
-
-    def __repr__(self):
-        return f'{__class__.__name__}({self.list})'
-
-    def sort(self, key=lambda x: x[0], reverse=False):
-        sorted_list = sorted(self.list, key=key, reverse=reverse)
-        return sorted_list
-
-    def calculate_delta(self, start_val, end_val, start_date, end_date):
-        time_delta = self.list[end_date] - self.list[start_date]
-        weight = self.list[start_val] - self.list[end_val]
-        if weight <= 0:
-            delta = weight / time_delta.days
-        else:
-            delta = -(weight / time_delta.days)
-        return delta
-
-    def calculate_net_change(self, start_val, end_val):
-        net_change = abs(self.list[start_val] - self.list[end_val])
-        return net_change
-
-    def calculate_time_to_goal(self, start_val, goal_val, delta):
-        diff = self.list[start_val] - goal_val
-        days = abs(int(diff / delta))
-        end_date = DATETODAY + datetime.timedelta(days=days)
-        return days, end_date
-
-
-class LiftHistory(WeightHistory):
-    """Define"""
-
-    def __init__(self, lift, lift_list=None):
-        super().__init__(lift_list)
-        self.lift = lift
-        self.list = lift_list
-
-    def __str__(self):
-        return f'(Lift: {self.lift}| Lift History: {self.list})'
-
-    def __repr__(self):
-        return f'{__class__.__name__}({self.lift}, {self.list})'
+    @staticmethod
+    def calculate_total_volume(sets):
+        total_volume = sum(obj.getattr(obj, 'volume', 0) for obj in sets)
+        return total_volume
 
 
 class DateEntry:
