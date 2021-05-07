@@ -1,5 +1,6 @@
 import datetime
 import logging
+import re
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
@@ -40,6 +41,11 @@ class User(db_class):
             except ValueError:
                 logger.exception('Value error encountered')
                 error = f'Cannot convert {self.username} to username format.'
+        match = re.match('^[a-zA-Z0-9]+[-_!]?[a-zA-Z0-9]', self.username)
+        if match:
+            self.username = match
+        else:
+            error = f'{self.username} is invalid.'
         if error:
             return error
 
@@ -52,6 +58,14 @@ class User(db_class):
                 logger.exception('Value error encountered.')
                 error = f'Cannot convert {self.email} provided to email format.'
         prefix, domain = self.email.split('@', 1)
+        prefix_match = re.match('^[a-zA-Z0-9]+[._-]?[a-zA-Z0-9]+', prefix)
+        domain_match = re.match('^[a-zA-Z0-9]+[-]?[a-zA-Z0-9]+[.]?[a-zA-Z]', domain)
+        if prefix_match and domain_match:
+            self.email = '@'.join((prefix, domain))
+        elif prefix_match is None:
+            pass
+        elif domain_match is None:
+            pass
         if error:
             return error
 
