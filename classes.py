@@ -45,6 +45,9 @@ class User(db_class):
         if len(username) < 8:
             error = f'Username must contain a minimum of 8 characters.'
             errors.append(error)
+        elif len(username) > 60:
+            error = f'Usernames must not exceed 60 characters in length.'
+            errors.append(error)
         if not re.match('^[a-zA-Z0-9]?', username):
             error = f'Usernames must start with an alpha-numeric character.'
             errors.append(error)
@@ -58,7 +61,7 @@ class User(db_class):
 
     @staticmethod
     def validate_email(email):
-        error = []
+        errors = []
         if not isinstance(email, str):
             try:
                 email = str(email)
@@ -75,8 +78,8 @@ class User(db_class):
             pass
         elif domain_match is None:
             pass
-        if error:
-            return error
+        if len(errors) > 0:
+            return errors
 
     @staticmethod
     def validate_password(password):
@@ -90,6 +93,13 @@ class User(db_class):
         if len(password) < 8:
             error = 'Passwords must contain a minimum of 8 characters.'
             errors.append(error)
+        elif len(password) > 128:
+            error = 'Passwords cannot exceed 128 characters in length.'
+            errors.append(error)
+        if len(errors) > 0:
+            return errors
+        else:
+            return password
 
 
 class WeightEntry(db_class):
@@ -103,15 +113,15 @@ class WeightEntry(db_class):
     weight = Column(Float(precision=2), nullable=False)
     user = relationship(User)
 
-    def __init__(self, date, weight):
-        self.date = DateEntry(date)
+    def __init__(self, weight, date=None):
         self.weight = weight
+        self.date = DateEntry(date)
 
     def __str__(self):
-        return f'Date: {self.date} | Weight: {self.weight}'
+        return f'Weight: {self.weight} | Date: {self.date}'
 
     def __repr__(self):
-        return f'{__class__.__name__}({self.date}, {self.weight}'
+        return f'{__class__.__name__}({self.weight}, {self.date}'
 
     @staticmethod
     def value_validation(value):
@@ -172,20 +182,20 @@ class SetEntry(WeightEntry):
         'concrete': True
     }
 
-    def __init__(self, lift, date, weight, reps, rpe=None):
-        super().__init__(date, weight)
-        self.date = DateEntry(date)
+    def __init__(self, lift, weight, reps, rpe=None, date=None):
+        super().__init__(weight, date)
         self.lift = lift
         self.weight = weight
         self.reps = reps
         self.volume = self.calculate_volume()
         self.rpe = rpe
+        self.date = DateEntry(date)
 
     def __str__(self):
-        return f'Date: {self.date} | Weight: {self.weight} | Reps: {self.reps} | RPE: {self.rpe}'
+        return f'Lift: {self.lift} | Weight: {self.weight} | Reps: {self.reps} | RPE: {self.rpe} | Date: {self.date} '
 
     def __repr__(self):
-        return f'{__class__.__name__}({self.date}, {self.weight}, {self.reps}, {self.rpe})'
+        return f'{__class__.__name__}({self.lift} {self.weight}, {self.reps}, {self.rpe}, {self.date})'
 
     def calculate_percentage_of_1_rep_max(self):
         """Calculates one-rep max using Brzycki formula and returns tuple of one-rep max and percentage of
