@@ -20,7 +20,7 @@ class User(db_class):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(length=150,), index=True, unique=True)
-    username = Column(String(length=150), nullable=False)
+    username = Column(String(length=60), nullable=False)
     password = Column(String(length=128))
 
     def __init__(self, username, email):
@@ -33,41 +33,63 @@ class User(db_class):
     def __repr__(self):
         return f'{__class__.__name__}({self.name})'
 
-    def validate_username(self):
-        error = None
-        if not isinstance(self.username, str):
+    @staticmethod
+    def validate_username(username):
+        errors = []
+        if not isinstance(username, str):
             try:
-                self.username = str(self.username)
+                username = str(username)
             except ValueError:
                 logger.exception('Value error encountered')
-                error = f'Cannot convert {self.username} to username format.'
-        match = re.match('^[a-zA-Z0-9]+[-_!]?[a-zA-Z0-9]', self.username)
-        if match:
-            self.username = match
+                return f'Cannot convert {username} to username format.'
+        if len(username) < 8:
+            error = f'Username must contain a minimum of 8 characters.'
+            errors.append(error)
+        if not re.match('^[a-zA-Z0-9]?', username):
+            error = f'Usernames must start with an alpha-numeric character.'
+            errors.append(error)
+        if not re.match('[-]?[!]?[_]?[?]?', username[1:]):
+            error = f'Usernames can only contain one each of the following special characters: !, ?, _, and -'
+            errors.append(error)
+        if len(errors) > 0:
+            return errors
         else:
-            error = f'{self.username} is invalid.'
-        if error:
-            return error
+            return username
 
-    def validate_email(self):
-        error = None
-        if not isinstance(self.email, str):
+    @staticmethod
+    def validate_email(email):
+        error = []
+        if not isinstance(email, str):
             try:
-                self.email = str(self.email)
+                email = str(email)
             except ValueError:
                 logger.exception('Value error encountered.')
-                error = f'Cannot convert {self.email} provided to email format.'
-        prefix, domain = self.email.split('@', 1)
+                return f'Cannot convert {email} to email format.'
+        prefix, domain = email.split('@', 1)
         prefix_match = re.match('^[a-zA-Z0-9]+[._-]?[a-zA-Z0-9]+', prefix)
         domain_match = re.match('^[a-zA-Z0-9]+[-]?[a-zA-Z0-9]+[.]?[a-zA-Z]', domain)
         if prefix_match and domain_match:
-            self.email = '@'.join((prefix, domain))
+            email = '@'.join((prefix, domain))
+            return email
         elif prefix_match is None:
             pass
         elif domain_match is None:
             pass
         if error:
             return error
+
+    @staticmethod
+    def validate_password(password):
+        errors = []
+        if not isinstance(password, str):
+            try:
+                password = str(password)
+            except ValueError:
+                logger.exception('Value error encountered.')
+                return f'Cannot convert password to password format.'
+        if len(password) < 8:
+            error = 'Passwords must contain a minimum of 8 characters.'
+            errors.append(error)
 
 
 class WeightEntry(db_class):
@@ -94,7 +116,7 @@ class WeightEntry(db_class):
     @staticmethod
     def value_validation(value):
         """Validates value parameter as being an instance of either int or float and raises TypeError if not."""
-        if not (isinstance(value, int) or isinstance(value, float)):
+        if not (isinstance(value, (int, float))):
             logger.exception('Type error encountered.')
         return value
 
