@@ -113,7 +113,7 @@ class WeightEntry(db_class):
     weight = Column(Float(precision=2), nullable=False)
     user = relationship(User)
 
-    def __init__(self, weight, date=None):
+    def __init__(self, weight, date=DATETODAY):
         self.weight = weight
         self.date = DateEntry(date)
 
@@ -182,7 +182,7 @@ class SetEntry(WeightEntry):
         'concrete': True
     }
 
-    def __init__(self, lift, weight, reps, rpe=None, date=None):
+    def __init__(self, lift, weight, reps, rpe=None, date=DATETODAY):
         super().__init__(weight, date)
         self.lift = lift
         self.weight = weight
@@ -202,7 +202,7 @@ class SetEntry(WeightEntry):
         one-rep max based on the set.
         """
         one_rep_max = self.weight / (1.0278 - 0.0278 * self.reps)
-        percentage = self.weight / one_rep_max
+        percentage = (self.weight / one_rep_max) * 100
         return percentage, one_rep_max
 
     def calculate_volume(self):
@@ -213,19 +213,19 @@ class SetEntry(WeightEntry):
     @staticmethod
     def average_rpe(sets):
         """Averages RPE for tuple of set objects and returns a float."""
-        average = (sum(set.getattr(set, 'rpe', 0) for set in sets)) / len(sets)
+        average = (sum(getattr(set, 'rpe', 0) for set in sets)) / len(sets)
         return average
 
     @staticmethod
     def calculate_total_reps(sets):
         """Sums reps for tuple of set objects and returns an integer."""
-        total_reps = sum(set.getattr(set, 'reps', 0) for set in sets)
+        total_reps = sum(getattr(set, 'reps', 0) for set in sets)
         return total_reps
 
     @staticmethod
     def calculate_total_volume(sets):
         """Sums volume for tuple of set objects and returns an integer."""
-        total_volume = sum(set.getattr(set, 'volume', 0) for set in sets)
+        total_volume = sum(getattr(set, 'volume', 0) for set in sets)
         return total_volume
 
 
