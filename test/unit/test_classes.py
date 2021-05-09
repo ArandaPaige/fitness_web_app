@@ -6,13 +6,33 @@ DATETODAY = datetime.date.today()
 
 
 class TestUser(unittest.TestCase):
-    def test_username_validation(self):
+    def test_username_plain_validation(self):
         username = User.validate_username('BoogtehWoog')
         self.assertEqual('BoogtehWoog', username)
+
+    def test_username_special_validation(self):
+        username = User.validate_username('Boog!teh?Woog')
+        self.assertEqual('Boog!teh?Woog', username)
+
+    def test_username_bad_validation(self):
+        username = User.validate_username('_BoogtehWoog')
+        self.assertNotEqual('_BoogtehWoog', username)
+
+    def test_username_bad_length_validation(self):
+        username = User.validate_username('Boog')
+        self.assertNotEqual('Boog', username)
 
     def test_email_validation(self):
         email = User.validate_username('BoogtehWoog@gmail.com')
         self.assertEqual('BoogtehWoog@gmail.com', email)
+
+    def test_email_dash_validation(self):
+        email = User.validate_username('Boog-tehWoog@gmail.com')
+        self.assertEqual('Boog-tehWoog@gmail.com', email)
+
+    def test_email_bad_validation(self):
+        email = User.validate_username('.Boog-tehWoog@gmail.com')
+        self.assertNotEqual('.Boog-tehWoog@gmail.com', email)
 
 
 class TestWeightEntry(unittest.TestCase):
@@ -69,5 +89,3 @@ class TestDateEntry(unittest.TestCase):
         date_entry1 = DateEntry()
         date_entry2 = DateEntry('2021-01-23')
         date_entry3 = DateEntry()
-
-
