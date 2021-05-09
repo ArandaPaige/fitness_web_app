@@ -19,9 +19,12 @@ class User(db_class):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String(length=150,), index=True, unique=True)
+    email = Column(String(length=150, ), unique=True)
     username = Column(String(length=60), nullable=False)
     password = Column(String(length=128))
+
+    weight_entries = relationship('WeightEntry', back_populates='user')
+    set_entries = relationship('SetEntry', back_populates='user')
 
     def __init__(self, username, email):
         self.username = username
@@ -48,7 +51,7 @@ class User(db_class):
         elif len(username) > 60:
             error = f'Usernames must not exceed 60 characters in length.'
             errors.append(error)
-        if not re.match('^[a-zA-Z0-9]?', username):
+        if re.match('^[^a-zA-Z0-9]', username):
             error = f'Usernames must start with an alpha-numeric character.'
             errors.append(error)
         if not re.match('[-]?[!]?[_]?[?]?', username[1:]):
@@ -111,7 +114,8 @@ class WeightEntry(db_class):
     user_id = Column(Integer, ForeignKey('users.id'))
     date = Column(Date, nullable=False)
     weight = Column(Float(precision=2), nullable=False)
-    user = relationship(User)
+
+    user = relationship("User", back_populates='weight_entries')
 
     def __init__(self, weight, date=DATETODAY):
         self.weight = weight
@@ -125,9 +129,14 @@ class WeightEntry(db_class):
 
     @staticmethod
     def value_validation(value):
-        """Validates value parameter as being an instance of either int or float and raises TypeError if not."""
+        """Validates value parameter as being an instance of either int or float and tries to convert to float
+        if it is not. If a value error occurs, it logs the exception and returns. Returns the value otherwise"""
         if not (isinstance(value, (int, float))):
-            logger.exception('Type error encountered.')
+            try:
+                value = float(value)
+            except ValueError:
+                logger.exception('Value error encountered.')
+                return
         return value
 
     @staticmethod
@@ -176,7 +185,8 @@ class SetEntry(WeightEntry):
     reps = Column(Integer, nullable=False)
     volume = Column(Integer, nullable=False)
     rpe = Column(Float(precision=1), nullable=True)
-    user = relationship(User)
+
+    user = relationship("User", back_populates='set_entries')
 
     __mapper_args__ = {
         'concrete': True
@@ -192,7 +202,7 @@ class SetEntry(WeightEntry):
         self.date = DateEntry(date)
 
     def __str__(self):
-        return f'Lift: {self.lift} | Weight: {self.weight} | Reps: {self.reps} | RPE: {self.rpe} | Date: {self.date} '
+        return f'Lift: {self.lift} | Weight: {self.weight} | Reps: {self.reps} | RPE: {self.rpe} | Date: {self.date}'
 
     def __repr__(self):
         return f'{__class__.__name__}({self.lift} {self.weight}, {self.reps}, {self.rpe}, {self.date})'
@@ -213,7 +223,8 @@ class SetEntry(WeightEntry):
     @staticmethod
     def average_rpe(sets):
         """Averages RPE for tuple of set objects and returns a float."""
-        average = (sum(getattr(set, 'rpe', 0) for set in sets)) / len(sets)
+        average = (sum(getattr(set, 'rpe', 0) for set in sets)) / len(
+            [set for set in sets if getattr(set, 'rpe') is not None])
         return average
 
     @staticmethod
