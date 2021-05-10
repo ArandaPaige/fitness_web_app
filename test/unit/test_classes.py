@@ -42,25 +42,25 @@ class TestWeightEntry(unittest.TestCase):
         self.weight_entry2 = WeightEntry(155, date=(DATETODAY - datetime.timedelta(days=5)))
 
     def test_calculate_net_change(self):
-        net_change = WeightEntry.calculate_net_change(self.weight_entry1.weight, self.weight_entry2.weight)
+        net_change = WeightEntry.calculate_net_change(self.weight_entry1, self.weight_entry2)
         self.assertEqual(net_change, 5)
 
     def test_calculate_delta(self):
         delta = WeightEntry.calculate_delta(
-            self.weight_entry1.weight, self.weight_entry2.weight,
-            self.weight_entry1.date.date, self.weight_entry2.date.date
+            self.weight_entry1, self.weight_entry2,
+            self.weight_entry1, self.weight_entry2
         )
-        self.assertEqual(delta, 1)
+        self.assertEqual(delta, -1)
 
     def test_calculate_time_to_goal(self):
-        days, end_date = WeightEntry.calculate_time_to_goal(self.weight_entry1.weight, 145, 1)
+        days, end_date = WeightEntry.calculate_time_to_goal(self.weight_entry1, 145, 1)
         self.assertEqual((days, end_date), (5, (DATETODAY + datetime.timedelta(days=5))))
 
 
 class TestSetEntry(unittest.TestCase):
 
     def setUp(self):
-        self.set_entry1 = SetEntry('Squat', 225, 10, 6)
+        self.set_entry1 = SetEntry('Squat', 225, 10, 6, date=(DATETODAY - datetime.timedelta(days=5)))
         self.set_entry2 = SetEntry('Squat', 300, 10, 9)
 
     def test_volume(self):
@@ -69,6 +69,21 @@ class TestSetEntry(unittest.TestCase):
     def test_calculate_percentage_one_1_rep_max(self):
         percentage, one_rep_max = self.set_entry2.calculate_percentage_of_1_rep_max()
         self.assertEqual((percentage, one_rep_max), (74.98, 400.1066951186983))
+
+    def test_net_change(self):
+        net_change = WeightEntry.calculate_net_change(self.set_entry1, self.set_entry2)
+        self.assertEqual(net_change, 75)
+
+    def test_calculate_delta(self):
+        delta = WeightEntry.calculate_delta(
+            self.set_entry1, self.set_entry2,
+            self.set_entry1, self.set_entry2
+        )
+        self.assertEqual(delta, 15)
+
+    def test_calculate_time_to_goal(self):
+        days, end_date = WeightEntry.calculate_time_to_goal(self.set_entry1, 250, 5)
+        self.assertEqual((days, end_date), (5, (DATETODAY + datetime.timedelta(days=5))))
 
     def test_average_rpe(self):
         average_rpe = SetEntry.average_rpe((self.set_entry1, self.set_entry2))

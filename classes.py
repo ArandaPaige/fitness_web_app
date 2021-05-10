@@ -2,6 +2,8 @@ import datetime
 import logging
 import re
 
+from model import deepgetattr
+
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -148,26 +150,26 @@ class WeightEntry(db_class):
     @staticmethod
     def calculate_net_change(start_val, end_val):
         """Subtracts end value from start value to determine net change and returns absolute float."""
-        net_change = abs(start_val - end_val)
+        net_change = abs(getattr(start_val, 'weight') - getattr(end_val, 'weight'))
         return net_change
 
     @staticmethod
     def calculate_delta(start_val, end_val, start_date, end_date):
         """Calculates delta based on difference between starting value and end value and length of time between the
         starting date and end date. Returns a float."""
-        time_delta = end_date - start_date
-        weight = start_val - end_val
+        time_delta = deepgetattr(end_date, 'date.date') - deepgetattr(start_date, 'date.date')
+        weight = getattr(start_val, 'weight') - getattr(end_val, 'weight')
         if weight <= 0:
-            delta = weight / time_delta.days
-        else:
             delta = -(weight / time_delta.days)
+        else:
+            delta = weight / time_delta.days
         return delta
 
     @staticmethod
     def calculate_time_to_goal(start_val, goal_val, delta):
         """Calculates days until the goal value is reached and returns a tuple of days left and the date upon
         which the goal will be achieved."""
-        days = abs((start_val - goal_val) / delta)
+        days = abs((getattr(start_val, 'weight') - goal_val) / delta)
         end_date = DATETODAY + datetime.timedelta(days=days)
         return days, end_date
 
