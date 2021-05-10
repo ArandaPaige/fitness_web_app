@@ -255,12 +255,22 @@ class DateEntry:
     def __repr__(self):
         return f'{__class__.__name__}({self.date})'
 
-    def validate(self):
-        if not (isinstance(self.date, datetime.date)):
+    @property
+    def date(self):
+        return self._date
+
+    @date.setter
+    def date(self, date):
+        self._date = self.validate(date)
+
+    @staticmethod
+    def validate(date):
+        if not (isinstance(date, datetime.date)):
             try:
-                self.date = datetime.datetime.strptime(self.date, '%Y-%m-%d')
+                date = datetime.datetime.strptime(date, '%Y-%m-%d')
             except ValueError:
                 logger.exception('Value error encountered.')
+        return date
 
     def format_date(self):
         """Validates date parameter if it matches ISO format and raises ValueError if it does not."""
