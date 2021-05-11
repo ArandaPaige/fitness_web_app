@@ -2,8 +2,6 @@ import datetime
 import logging
 import re
 
-from model import deepgetattr
-
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -24,19 +22,33 @@ class User(db_class):
     email = Column(String(length=150, ), unique=True)
     username = Column(String(length=60), nullable=False)
     password = Column(String(length=128))
+    start_weight = Column(Float(precision=2), nullable=False)
+    goal_weight = Column(Float(precision=2), nullable=True)
 
     weight_entries = relationship('WeightEntry', back_populates='user')
     set_entries = relationship('SetEntry', back_populates='user')
 
-    def __init__(self, username, email):
+    def __init__(self, username, email, start_weight, goal_weight, date=DATETODAY):
         self.username = username
         self.email = email
+        self.start_weight = start_weight
+        self.goal_weight = goal_weight
+        self.date = date
 
     def __str__(self):
-        return f'(Name: {self.name})'
+        return f'Name: {self.username}, Email: {self.email}'
 
     def __repr__(self):
-        return f'{__class__.__name__}({self.name})'
+        return f'{__class__.__name__}({self.username}, {self.email})'
+
+    @property
+    def start_weight(self):
+        return self._start_weight
+
+    @start_weight.setter
+    def start_weight(self, weight):
+        weight = WeightEntry(weight, self.date)
+        self._start_weight = getattr(weight, 'weight')
 
     @staticmethod
     def validate_username(username):
@@ -114,20 +126,29 @@ class WeightEntry(db_class):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-    date = Column(Date, nullable=False)
+    date = Column(Date, index=True, nullable=False)
     weight = Column(Float(precision=2), nullable=False)
 
     user = relationship("User", back_populates='weight_entries')
 
     def __init__(self, weight, date=DATETODAY):
         self.weight = weight
-        self.date = DateEntry(date)
+        self.date = date
 
     def __str__(self):
         return f'Weight: {self.weight} | Date: {self.date}'
 
     def __repr__(self):
         return f'{__class__.__name__}({self.weight}, {self.date}'
+
+    @property
+    def date(self):
+        return self._date
+
+    @date.setter
+    def date(self, date):
+        date_entry = DateEntry(date)
+        self._date = getattr(date_entry, 'date')
 
     @staticmethod
     def value_validation(value):
@@ -157,7 +178,7 @@ class WeightEntry(db_class):
     def calculate_delta(start_val, end_val, start_date, end_date):
         """Calculates delta based on difference between starting value and end value and length of time between the
         starting date and end date. Returns a float."""
-        time_delta = deepgetattr(end_date, 'date.date') - deepgetattr(start_date, 'date.date')
+        time_delta = getattr(end_date, '_date') - getattr(start_date, '_date')
         weight = getattr(start_val, 'weight') - getattr(end_val, 'weight')
         if weight <= 0:
             delta = -(weight / time_delta.days)
@@ -181,7 +202,7 @@ class SetEntry(WeightEntry):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-    date = Column(Date, nullable=False)
+    date = Column(Date, index=True, nullable=False)
     lift = Column(String(length=30), nullable=False)
     weight = Column(Float(precision=2), nullable=False)
     reps = Column(Integer, nullable=False)
@@ -201,13 +222,22 @@ class SetEntry(WeightEntry):
         self.reps = reps
         self.volume = self.calculate_volume()
         self.rpe = rpe
-        self.date = DateEntry(date)
+        self.date = date
 
     def __str__(self):
         return f'Lift: {self.lift} | Weight: {self.weight} | Reps: {self.reps} | RPE: {self.rpe} | Date: {self.date}'
 
     def __repr__(self):
         return f'{__class__.__name__}({self.lift} {self.weight}, {self.reps}, {self.rpe}, {self.date})'
+
+    @property
+    def date(self):
+        return self._date
+
+    @date.setter
+    def date(self, date):
+        date_entry = DateEntry(date)
+        self._date = getattr(date_entry, 'date')
 
     def calculate_percentage_of_1_rep_max(self):
         """Calculates one-rep max using Brzycki formula and returns tuple of one-rep max and percentage of
@@ -247,12 +277,9 @@ class DateEntry:
 
     def __init__(self, date=DATETODAY):
         self.date = date
-        self.year = None
-        self.month = None
-        self.day = None
 
     def __str__(self):
-        return f'{self.year}-{self.month}-{self.day}'
+        return f'{self._date.year}-{self._date.month}-{self._date.day}'
 
     def __repr__(self):
         return f'{__class__.__name__}({self.date})'
@@ -263,6 +290,7 @@ class DateEntry:
 
     @date.setter
     def date(self, date):
+        date = self.validate(date)
         self._date = self.validate(date)
 
     @staticmethod
@@ -273,13 +301,3 @@ class DateEntry:
             except ValueError:
                 logger.exception('Value error encountered.')
         return date
-
-    def format_date(self):
-        """Validates date parameter if it matches ISO format and raises ValueError if it does not."""
-        date = '-'.join((self.year, self.month, self.day))
-        try:
-            date_obj = datetime.datetime.strptime(date, '%Y-%m-%d')
-        except ValueError:
-            logger.exception('Value error encountered.')
-        else:
-            return date_obj
