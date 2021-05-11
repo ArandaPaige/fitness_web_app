@@ -5,6 +5,7 @@ import pg8000
 from dotenv import dotenv_values
 
 from sqlalchemy import text, create_engine
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -29,3 +30,28 @@ class DatabaseManager:
 
     def initialize_tables(self):
         self.db_base.metadata.create_all(self.engine)
+
+    def session_context_mgr(self, method):
+        session = Session(self.engine)
+
+        def session_wrapper(*args, **kwargs):
+            with session as sess, session.begin():
+                result = method(sess, *args, **kwargs)
+                if result is not None or len(result) > 0:
+                    return result
+                else:
+                    sess.commit()
+                    return
+        return session_wrapper
+
+    @session_context_mgr
+    def add_instance(self, session, *instances):
+        for instance in instances:
+            session.add(instance)
+        return
+
+    @session_context_mgr
+    def delete_obj(self, session, *obj):
+        for obj in obj:
+            session.delete(obj)
+        return
