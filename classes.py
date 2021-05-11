@@ -22,18 +22,19 @@ class User(db_class):
     email = Column(String(length=150, ), unique=True)
     username = Column(String(length=60), nullable=False)
     password = Column(String(length=128))
-    start_weight = Column(Float(precision=2), nullable=False)
+    _start_weight = Column(Float(precision=2), nullable=False)
     goal_weight = Column(Float(precision=2), nullable=True)
 
     weight_entries = relationship('WeightEntry', back_populates='user')
     set_entries = relationship('SetEntry', back_populates='user')
 
-    def __init__(self, username, email, start_weight, goal_weight, date=DATETODAY):
+    def __init__(self, username, email, password, start_weight, goal_weight, date=DATETODAY):
         self.username = username
         self.email = email
+        self.password = password
+        self.date = date
         self.start_weight = start_weight
         self.goal_weight = goal_weight
-        self.date = date
 
     def __str__(self):
         return f'Name: {self.username}, Email: {self.email}'
@@ -52,6 +53,8 @@ class User(db_class):
 
     @staticmethod
     def validate_username(username):
+        """Validates whether or not given username conforms to correct username parameters and either returns the
+        username or a list of errors."""
         errors = []
         if not isinstance(username, str):
             try:
@@ -78,6 +81,8 @@ class User(db_class):
 
     @staticmethod
     def validate_email(email):
+        """Validates whether or not given email conforms to email pattern standards and either returns the email or
+        a list of errors."""
         errors = []
         if not isinstance(email, str):
             try:
@@ -126,7 +131,7 @@ class WeightEntry(db_class):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-    date = Column(Date, index=True, nullable=False)
+    _date = Column(Date, index=True, nullable=False)
     weight = Column(Float(precision=2), nullable=False)
 
     user = relationship("User", back_populates='weight_entries')
@@ -202,7 +207,7 @@ class SetEntry(WeightEntry):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-    date = Column(Date, index=True, nullable=False)
+    _date = Column(Date, index=True, nullable=False)
     lift = Column(String(length=30), nullable=False)
     weight = Column(Float(precision=2), nullable=False)
     reps = Column(Integer, nullable=False)
@@ -300,4 +305,5 @@ class DateEntry:
                 date = datetime.datetime.strptime(date, '%Y-%m-%d')
             except ValueError:
                 logger.exception('Value error encountered.')
+                date = DATETODAY
         return date
