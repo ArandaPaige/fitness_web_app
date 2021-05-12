@@ -25,8 +25,14 @@ class User(db_class):
     _start_weight = Column(Float(precision=2), nullable=False)
     goal_weight = Column(Float(precision=2), nullable=True)
 
-    weight_entries = relationship('WeightEntry', back_populates='user')
-    set_entries = relationship('SetEntry', back_populates='user')
+    weight_entries = relationship('WeightEntry', back_populates='user',
+                                  cascade='all, delete',
+                                  passive_deletes=True
+                                  )
+    set_entries = relationship('SetEntry', back_populates='user',
+                               cascade='all, delete',
+                               passive_deletes=True
+                               )
 
     def __init__(self, username, email, password, start_weight, goal_weight, date=DATETODAY):
         self.username = username
@@ -130,7 +136,7 @@ class WeightEntry(db_class):
     __tablename__ = 'weight_history'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"))
     _date = Column(Date, index=True, nullable=False)
     weight = Column(Float(precision=2), nullable=False)
 
@@ -206,7 +212,7 @@ class SetEntry(WeightEntry):
     __tablename__ = 'lifting_history'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"))
     _date = Column(Date, index=True, nullable=False)
     lift = Column(String(length=30), nullable=False)
     weight = Column(Float(precision=2), nullable=False)
