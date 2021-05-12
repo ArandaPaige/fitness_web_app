@@ -29,7 +29,6 @@ def session_context_mgr(method):
             else:
                 sess.commit()
                 return
-
     return session_wrapper
 
 
@@ -45,6 +44,12 @@ def select_object_all(session, query_obj, filter_kwargs):
     statement = select(query_obj).filter_by(**filter_kwargs)
     result = session.execute(statement).first()
     return result
+
+
+@session_context_mgr
+def update_object(session, objects):
+    for obj in objects():
+        pass
 
 
 @session_context_mgr
