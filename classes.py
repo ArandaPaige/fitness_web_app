@@ -1,6 +1,7 @@
 import datetime
 import logging
 import re
+import bcrypt
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
@@ -56,7 +57,7 @@ class User(db_class):
 
     @username.setter
     def username(self, username):
-        value = self.validate_username()
+        value = self.validate_username(username)
         if username == value:
             self._username = value
 
@@ -66,7 +67,7 @@ class User(db_class):
 
     @email.setter
     def email(self, email):
-        value = self.validate_username()
+        value = self.validate_email(email)
         if email == value:
             self._email = value
 
@@ -76,9 +77,10 @@ class User(db_class):
 
     @password.setter
     def password(self, password):
-        value = self.validate_username()
+        value = self.validate_password(password)
         if password == value:
-            self._password = value
+            hashed_pw = self.hash_password(value)
+            self._password = hashed_pw
 
     @property
     def start_weight(self):
@@ -89,10 +91,21 @@ class User(db_class):
         weight = WeightEntry(weight, self.date)
         self._start_weight = getattr(weight, 'weight')
 
-    def validate_username(self):
+    def check_password_hash(self, password):
+        if bcrypt.checkpw(password, self._password):
+            return None
+        else:
+            return 'Incorrect password.'
+
+    @staticmethod
+    def hash_password(password):
+        hashed_pw = bcrypt.hashpw(password, bcrypt.gensalt())
+        return hashed_pw
+
+    @staticmethod
+    def validate_username(username):
         """Validates whether or not given username conforms to correct username parameters and either returns the
         username or a list of errors."""
-        username = self.username
         errors = []
         if not isinstance(username, str):
             try:
@@ -117,10 +130,10 @@ class User(db_class):
         else:
             return username
 
-    def validate_email(self):
+    @staticmethod
+    def validate_email(email):
         """Validates whether or not given email conforms to email pattern standards and either returns the email or
         a list of errors."""
-        email = self.email
         errors = []
         if not isinstance(email, str):
             try:
@@ -141,8 +154,8 @@ class User(db_class):
         if len(errors) > 0:
             return errors
 
-    def validate_password(self):
-        password = self.password
+    @staticmethod
+    def validate_password(password):
         errors = []
         if not isinstance(password, str):
             try:
@@ -160,9 +173,6 @@ class User(db_class):
             return errors
         else:
             return password
-
-    def hash_password(self):
-        pass
 
 
 class WeightEntry(db_class):
@@ -226,7 +236,7 @@ class WeightEntry(db_class):
         starting date and end date. Returns a float."""
         time_delta = getattr(end_date, '_date') - getattr(start_date, '_date')
         weight = getattr(start_val, 'weight') - getattr(end_val, 'weight')
-        if weight <= 0:
+        if weight < 0:
             delta = -(weight / time_delta.days)
         else:
             delta = weight / time_delta.days
