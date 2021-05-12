@@ -19,9 +19,9 @@ class User(db_class):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String(length=150, ), unique=True)
-    username = Column(String(length=60), nullable=False)
-    password = Column(String(length=128))
+    _email = Column(String(length=150, ), unique=True)
+    _username = Column(String(length=60), nullable=False)
+    _password = Column(String(length=128))
     _start_weight = Column(Float(precision=2), nullable=False)
     goal_weight = Column(Float(precision=2), nullable=True)
 
@@ -43,10 +43,42 @@ class User(db_class):
         self.goal_weight = goal_weight
 
     def __str__(self):
-        return f'Name: {self.username}, Email: {self.email}'
+        return f'Name: {self.username} - Email: {self.email} ' \
+               f'- Start Weight: {self._start_weight} - Goal Weight: {self.goal_weight}'
 
     def __repr__(self):
-        return f'{__class__.__name__}({self.username}, {self.email})'
+        return f'{__class__.__name__}({self._username}, {self._email}, ' \
+               f'{self._password}, {self._start_weight}, {self.goal_weight})'
+
+    @property
+    def username(self):
+        return self._username
+
+    @username.setter
+    def username(self, username):
+        value = self.validate_username()
+        if username == value:
+            self._username = value
+
+    @property
+    def email(self):
+        return self._email
+
+    @email.setter
+    def email(self, email):
+        value = self.validate_username()
+        if email == value:
+            self._email = value
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, password):
+        value = self.validate_username()
+        if password == value:
+            self._password = value
 
     @property
     def start_weight(self):
@@ -57,10 +89,10 @@ class User(db_class):
         weight = WeightEntry(weight, self.date)
         self._start_weight = getattr(weight, 'weight')
 
-    @staticmethod
-    def validate_username(username):
+    def validate_username(self):
         """Validates whether or not given username conforms to correct username parameters and either returns the
         username or a list of errors."""
+        username = self.username
         errors = []
         if not isinstance(username, str):
             try:
@@ -85,10 +117,10 @@ class User(db_class):
         else:
             return username
 
-    @staticmethod
-    def validate_email(email):
+    def validate_email(self):
         """Validates whether or not given email conforms to email pattern standards and either returns the email or
         a list of errors."""
+        email = self.email
         errors = []
         if not isinstance(email, str):
             try:
@@ -109,8 +141,8 @@ class User(db_class):
         if len(errors) > 0:
             return errors
 
-    @staticmethod
-    def validate_password(password):
+    def validate_password(self):
+        password = self.password
         errors = []
         if not isinstance(password, str):
             try:
@@ -128,6 +160,9 @@ class User(db_class):
             return errors
         else:
             return password
+
+    def hash_password(self):
+        pass
 
 
 class WeightEntry(db_class):
