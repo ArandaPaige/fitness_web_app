@@ -34,6 +34,11 @@ class TestUser(unittest.TestCase):
         email = User.validate_username('.Boog-tehWoog@gmail.com')
         self.assertNotEqual('.Boog-tehWoog@gmail.com', email)
 
+    def test_check_hashed_pw(self):
+        user = User('BoogtehWoog', 'BoogtehWoog@gmail.com', 'Boogest1', 185, 180)
+        value = user.check_password_hash('Boogest1')
+        self.assertEqual(None, value)
+
 
 class TestWeightEntry(unittest.TestCase):
 
@@ -101,6 +106,5 @@ class TestSetEntry(unittest.TestCase):
 class TestDateEntry(unittest.TestCase):
 
     def setUp(self):
-        date_entry1 = DateEntry()
-        date_entry2 = DateEntry('2021-01-23')
-        date_entry3 = DateEntry()
+        self.date_entry1 = DateEntry(33)
+        self.date_entry2 = DateEntry('2021-01-23')

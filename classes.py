@@ -1,8 +1,8 @@
 import datetime
 import logging
 import re
-import bcrypt
 
+import bcrypt
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -44,7 +44,7 @@ class User(db_class):
         self.goal_weight = goal_weight
 
     def __str__(self):
-        return f'Name: {self.username} - Email: {self.email} ' \
+        return f'Name: {self._username} - Email: {self._email} Password: {self._password}' \
                f'- Start Weight: {self._start_weight} - Goal Weight: {self.goal_weight}'
 
     def __repr__(self):
@@ -79,6 +79,7 @@ class User(db_class):
     def password(self, password):
         value = self.validate_password(password)
         if password == value:
+            value = value.encode(encoding='utf-8')
             hashed_pw = self.hash_password(value)
             self._password = hashed_pw
 
@@ -92,6 +93,7 @@ class User(db_class):
         self._start_weight = getattr(weight, 'weight')
 
     def check_password_hash(self, password):
+        password = password.encode(encoding='utf-8')
         if bcrypt.checkpw(password, self._password):
             return None
         else:
