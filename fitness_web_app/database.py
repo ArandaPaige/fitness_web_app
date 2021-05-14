@@ -1,6 +1,5 @@
 import logging
 import classes
-import pg8000
 
 from dotenv import dotenv_values
 
@@ -9,7 +8,7 @@ from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
-USER, KEY_VAL, HOST, DB = (env for env in dotenv_values('.env').values())
+USER, KEY_VAL, HOST, DB = (env for env in dotenv_values('../.env').values())
 
 # ENGINE = create_engine(f"postgresql+pg8000://{USER}:{KEY_VAL}@{HOST}/{DB}", client_encoding='utf8')
 

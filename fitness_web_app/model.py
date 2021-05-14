@@ -36,7 +36,7 @@ def add_instance(instance):
     database.add_object(instance)
 
 
-def update_instance(obj_class, obj_ref, attribute):
+def update_instance(obj_class, obj_ref, instance):
     pass
 
 

@@ -1,8 +1,14 @@
 import unittest
 
 
-class MyTestCase(unittest.TestCase):
-    def test_something(self):
+class TestDatabase(unittest.TestCase):
+    def test_session_ctx_mgr(self):
+        self.assertEqual(True, False)
+
+    def test_add_object(self):
+        self.assertEqual(True, False)
+
+    def test_delete_object(self):
         self.assertEqual(True, False)
 
 
