@@ -29,6 +29,7 @@ def session_context_mgr(method):
             else:
                 sess.commit()
                 return
+
     return session_wrapper
 
 
@@ -40,20 +41,32 @@ def add_object(session, objects):
 
 
 @session_context_mgr
-def select_object_all(session, query_obj, filter_kwargs):
+def update_object(session, query_obj, filter_kwargs):
+    obj = select_object(query_obj, filter_kwargs)
+    session.delete(obj)
+
+
+@session_context_mgr
+def delete_object(session, query_obj, filter_kwargs):
     statement = select(query_obj).filter_by(**filter_kwargs)
     result = session.execute(statement).first()
+    session.delete(result[0])
+
+
+@session_context_mgr
+def retrieve_object(session, query_obj, statement, filter_kwargs):
+    result = session.execute(select(query_obj).filter_by(**filter_kwargs))
     return result
 
 
-@session_context_mgr
-def update_object(session, objects):
-    for obj in objects():
-        pass
+def select_object(session, query_obj, filter_kwargs):
+    statement = select(query_obj).filter_by(**filter_kwargs)
+    result = session.execute(statement)
+    return result
 
 
-@session_context_mgr
-def delete_object(session, objects):
-    for obj in objects:
-        session.delete(obj)
-    return
+user = classes.User('BoogtehWoog', 'BoogtehWoog@gmail.com', 'Boogest1')
+
+add_object((user,))
+
+# delete_object(classes.User, {'_username': 'BoogtehWoog'})
