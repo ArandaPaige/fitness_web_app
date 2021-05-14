@@ -20,11 +20,11 @@ class User(db_class):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    _email = Column(String(length=150, ), unique=True)
-    _username = Column(String(length=60), nullable=False)
-    _password = Column(String(length=128))
-    _start_weight = Column(Float(precision=2), nullable=False)
-    goal_weight = Column(Float(precision=2), nullable=True)
+    _username = Column(String(length=60), name='username', nullable=False)
+    _email = Column(String(length=150, ), name='email', unique=True)
+    _password = Column(String(length=128), name='password')
+    start_weight = Column(Float(precision=2), name='start_weight', nullable=True)
+    goal_weight = Column(Float(precision=2), name='goal_weight', nullable=True)
 
     weight_entries = relationship('WeightEntry', back_populates='user',
                                   cascade='all, delete',
@@ -35,21 +35,16 @@ class User(db_class):
                                passive_deletes=True
                                )
 
-    def __init__(self, username, email, password, start_weight, goal_weight, date=DATETODAY):
+    def __init__(self, username, email, password):
         self.username = username
         self.email = email
         self.password = password
-        self.date = date
-        self.start_weight = start_weight
-        self.goal_weight = goal_weight
 
     def __str__(self):
-        return f'Name: {self._username} - Email: {self._email} Password: {self._password}' \
-               f'- Start Weight: {self._start_weight} - Goal Weight: {self.goal_weight}'
+        return f'Username: {self._username} - Email: {self._email} Password: {self._password}'
 
     def __repr__(self):
-        return f'{__class__.__name__}({self._username}, {self._email}, ' \
-               f'{self._password}, {self._start_weight}, {self.goal_weight})'
+        return f'{__class__.__name__}({self._username}, {self._email})'
 
     @property
     def username(self):
@@ -82,15 +77,6 @@ class User(db_class):
             value = value.encode(encoding='utf-8')
             hashed_pw = self.hash_password(value)
             self._password = hashed_pw
-
-    @property
-    def start_weight(self):
-        return self._start_weight
-
-    @start_weight.setter
-    def start_weight(self, weight):
-        weight = WeightEntry(weight, self.date)
-        self._start_weight = getattr(weight, 'weight')
 
     def check_password_hash(self, password):
         password = password.encode(encoding='utf-8')
@@ -189,7 +175,8 @@ class WeightEntry(db_class):
 
     user = relationship("User", back_populates='weight_entries')
 
-    def __init__(self, weight, date=DATETODAY):
+    def __init__(self, user_id, weight, date=DATETODAY):
+        self.user_id = user_id
         self.weight = weight
         self.date = date
 
@@ -273,8 +260,9 @@ class SetEntry(WeightEntry):
         'concrete': True
     }
 
-    def __init__(self, lift, weight, reps, rpe=None, date=DATETODAY):
+    def __init__(self, user_id, lift, weight, reps, rpe=None, date=DATETODAY):
         super().__init__(weight, date)
+        self.user_id = user_id
         self.lift = lift
         self.weight = weight
         self.reps = reps
@@ -283,7 +271,8 @@ class SetEntry(WeightEntry):
         self.date = date
 
     def __str__(self):
-        return f'Lift: {self.lift} | Weight: {self.weight} | Reps: {self.reps} | RPE: {self.rpe} | Date: {self.date}'
+        return f'Lift: {self.lift} | Weight: {self.weight} ' \
+               f'| Reps: {self.reps} | RPE: {self.rpe} | Date: {self.date}'
 
     def __repr__(self):
         return f'{__class__.__name__}({self.lift} {self.weight}, {self.reps}, {self.rpe}, {self.date})'
