@@ -1,5 +1,5 @@
 import logging
-import classes
+import model
 
 from dotenv import dotenv_values
 
@@ -13,7 +13,7 @@ USER, KEY_VAL, HOST, DB = (env for env in dotenv_values('../.env').values())
 # ENGINE = create_engine(f"postgresql+pg8000://{USER}:{KEY_VAL}@{HOST}/{DB}", client_encoding='utf8')
 
 ENGINE = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
-DB_BASE = classes.db_class
+DB_BASE = model.db_class
 DB_BASE.metadata.create_all(ENGINE)
 
 
@@ -64,7 +64,7 @@ def select_object(session, query_obj, filter_kwargs):
     return result
 
 
-user = classes.User('BoogtehWoog', 'BoogtehWoog@gmail.com', 'Boogest1')
+user = model.User('BoogtehWoog', 'BoogtehWoog@gmail.com', 'Boogest1')
 
 add_object((user,))
 

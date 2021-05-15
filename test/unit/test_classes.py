@@ -1,6 +1,6 @@
 import unittest
 import datetime
-from fitness_web_app.classes import User, WeightEntry, DateEntry, SetEntry
+from fitness_web_app.model import User, WeightEntry, DateEntry, SetEntry
 
 DATETODAY = datetime.date.today()
 
