@@ -1,5 +1,4 @@
 import logging.config
-import web
 
 
 LOG_CONFIG = {

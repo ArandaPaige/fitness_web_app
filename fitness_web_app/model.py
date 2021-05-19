@@ -4,9 +4,13 @@ import re
 from functools import reduce
 
 import bcrypt
+from flask_wtf import FlaskForm
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from wtforms import StringField, PasswordField
+from wtforms.fields.html5 import EmailField
+from wtforms.validators import Email, InputRequired, Length
 
 import database
 
@@ -388,3 +392,58 @@ class DateEntry:
                 logger.exception('Value error encountered.')
                 date = DATETODAY
         return date
+
+
+class RegistrationForm(FlaskForm):
+    """Define"""
+
+    def __init__(self):
+        super().__init__()
+        email = EmailField(
+            'Email',
+            [
+                InputRequired(),
+                Email()
+            ]
+        )
+        username = StringField(
+            'Username',
+            [
+                InputRequired(),
+                Length(),
+            ]
+        )
+        password = PasswordField(
+            'Password',
+            [
+                InputRequired(),
+                Length(),
+            ]
+        )
+
+    def validate_existing_user(self):
+        pass
+
+
+class LoginForm(FlaskForm):
+    """Define"""
+
+    def __init__(self):
+        super().__init__()
+        username = StringField(
+            'Username',
+            [
+                InputRequired(),
+                Length(),
+            ]
+        )
+        password = PasswordField(
+            'Password',
+            [
+                InputRequired(),
+                Length(),
+            ]
+        )
+
+    def validate_user_exists(self):
+        pass
