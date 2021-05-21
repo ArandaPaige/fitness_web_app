@@ -10,7 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from wtforms import StringField, PasswordField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import Email, InputRequired, Length
+from wtforms.validators import Email, InputRequired, Length, ValidationError
 
 import database
 
@@ -418,11 +418,14 @@ class RegistrationForm(FlaskForm):
             [
                 InputRequired(),
                 Length(),
+                self.validate_existing_user()
             ]
         )
 
     def validate_existing_user(self):
-        pass
+        user = retrieve_user(self.username.data)
+        if user is not None:
+            raise ValidationError(f'{self.username.data} already exists. Please enter another username.')
 
 
 class LoginForm(FlaskForm):
@@ -442,8 +445,11 @@ class LoginForm(FlaskForm):
             [
                 InputRequired(),
                 Length(),
+                self.validate_user_exists()
             ]
         )
 
     def validate_user_exists(self):
-        pass
+        user = retrieve_user(self.username.data)
+        if user is None:
+            raise ValidationError(f'{self.username.data} does not exist. Please enter another username.')
