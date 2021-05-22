@@ -8,9 +8,9 @@ from flask_wtf import FlaskForm
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, SubmitField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import Email, InputRequired, Length, ValidationError
+from wtforms.validators import Email, InputRequired, Length, EqualTo, ValidationError
 
 import database
 
@@ -397,59 +397,56 @@ class DateEntry:
 class RegistrationForm(FlaskForm):
     """Define"""
 
-    def __init__(self):
-        super().__init__()
-        email = EmailField(
-            'Email',
-            [
-                InputRequired(),
-                Email()
-            ]
-        )
-        username = StringField(
-            'Username',
-            [
-                InputRequired(),
-                Length(),
-            ]
-        )
-        password = PasswordField(
-            'Password',
-            [
-                InputRequired(),
-                Length(),
-                self.validate_existing_user()
-            ]
-        )
+    email = EmailField(
+        'Email',
+        validators=[
+            InputRequired(),
+            Email()
+        ]
+    )
+    username = StringField(
+        'Username',
+        validators=[
+            InputRequired(),
+            Length(),
+        ]
+    )
+    password = PasswordField(
+        'Password',
+        validators=[
+            InputRequired(),
+            Length(),
+        ]
+    )
+    confirm_password = PasswordField('Confirm Password', validators=[EqualTo('password')])
+    submit = SubmitField('Register')
 
-    def validate_existing_user(self):
-        user = retrieve_user(self.username.data)
+    def validate_existing_user(form, field):
+        user = retrieve_user(field.username.data)
         if user is not None:
-            raise ValidationError(f'{self.username.data} already exists. Please enter another username.')
+            raise ValidationError(f'{field.username.data} already exists. Please enter another username.')
 
 
 class LoginForm(FlaskForm):
     """Define"""
 
-    def __init__(self):
-        super().__init__()
-        username = StringField(
-            'Username',
-            [
-                InputRequired(),
-                Length(),
-            ]
-        )
-        password = PasswordField(
-            'Password',
-            [
-                InputRequired(),
-                Length(),
-                self.validate_user_exists()
-            ]
-        )
+    username = StringField(
+        'Username',
+        validators=[
+            InputRequired(),
+            Length(),
+        ]
+    )
+    password = PasswordField(
+        'Password',
+        validators=[
+            InputRequired(),
+            Length(),
+        ]
+    )
+    submit = SubmitField('Log In')
 
-    def validate_user_exists(self):
-        user = retrieve_user(self.username.data)
+    def validate_user_exists(form, field):
+        user = retrieve_user(field.data)
         if user is None:
-            raise ValidationError(f'{self.username.data} does not exist. Please enter another username.')
+            raise ValidationError(f'{field.username.data} does not exist. Please enter another username.')
