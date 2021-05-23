@@ -1,19 +1,20 @@
+import datetime
 import logging
-import model
 
 from dotenv import dotenv_values
-
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.declarative import declarative_base
+
+db_class = declarative_base()
 
 logger = logging.getLogger(__name__)
 
-USER, KEY_VAL, HOST, DB = (env for env in dotenv_values('../.env').values())
-
+# USER, KEY_VAL, HOST, DB = (env for env in dotenv_values('fitness_web_app/.env').values())
 # ENGINE = create_engine(f"postgresql+pg8000://{USER}:{KEY_VAL}@{HOST}/{DB}", client_encoding='utf8')
 
 ENGINE = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
-DB_BASE = model.db_class
+DB_BASE = db_class
 DB_BASE.metadata.create_all(ENGINE)
 
 
@@ -62,10 +63,3 @@ def select_object(session, query_obj, filter_kwargs):
     statement = select(query_obj).filter_by(**filter_kwargs)
     result = session.execute(statement)
     return result
-
-
-user = model.User('BoogtehWoog', 'BoogtehWoog@gmail.com', 'Boogest1')
-
-add_object((user,))
-
-# delete_object(classes.User, {'_username': 'BoogtehWoog'})

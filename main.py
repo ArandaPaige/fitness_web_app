@@ -1,5 +1,5 @@
 import logging.config
-
+from fitness_web_app import app
 
 LOG_CONFIG = {
     'version': 1,
@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    pass
+    app.run(debug=True)
 
 
 if __name__ == '__main__':

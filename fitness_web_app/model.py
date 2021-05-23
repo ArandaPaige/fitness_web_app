@@ -6,19 +6,16 @@ from functools import reduce
 import bcrypt
 from flask_wtf import FlaskForm
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Email, InputRequired, Length, EqualTo, ValidationError
 
-import database
+from fitness_web_app.database import *
 
 logger = logging.getLogger(__name__)
 
 DATETODAY = datetime.date.today()
-
-db_class = declarative_base()
 
 
 def deepgetattr(obj, attr):
@@ -28,7 +25,7 @@ def deepgetattr(obj, attr):
 
 def retrieve_user(username):
     filter_args = {'_username': username}
-    user = database.retrieve_object(User, filter_args)
+    user = retrieve_object(User, filter_args)
     return user
 
 
@@ -47,8 +44,8 @@ def new_lift_entry(user_id, lift, weight, reps, date=DATETODAY):
     return lift_entry
 
 
-def add_instance(instance):
-    database.add_object(instance)
+def add_instance(db, instance):
+    db.add_object(instance)
 
 
 def update_instance(obj_class, obj_ref, instance):
@@ -408,14 +405,14 @@ class RegistrationForm(FlaskForm):
         'Username',
         validators=[
             InputRequired(),
-            Length(),
+            Length(min=8, max=60),
         ]
     )
     password = PasswordField(
         'Password',
         validators=[
             InputRequired(),
-            Length(),
+            Length(min=8, max=60),
         ]
     )
     confirm_password = PasswordField('Confirm Password', validators=[EqualTo('password')])
@@ -434,14 +431,14 @@ class LoginForm(FlaskForm):
         'Username',
         validators=[
             InputRequired(),
-            Length(),
+            Length(min=8, max=60),
         ]
     )
     password = PasswordField(
         'Password',
         validators=[
             InputRequired(),
-            Length(),
+            Length(min=8, max=60),
         ]
     )
     submit = SubmitField('Log In')
