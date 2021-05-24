@@ -10,7 +10,7 @@ SECRET_KEY = getenv('KEY')
 app.config.update(
     {
         'DEBUG': True,
-        'SECRET KEY': SECRET_KEY
+        'SECRET_KEY': SECRET_KEY
     }
 )
 
