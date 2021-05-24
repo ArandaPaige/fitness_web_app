@@ -5,7 +5,7 @@ from fitness_web_app.model import RegistrationForm, LoginForm
 
 @app.route("/")
 def home():
-    return "<p>Hello, World!</p>"
+    return render_template('home.html', title='Home')
 
 
 @app.route('/login/', methods=['POST', 'GET'])
