@@ -1,7 +1,3 @@
-body {
-    background-color: tomato;
-}
-
 p {
     color: white;
 }
@@ -23,6 +19,7 @@ p {
 .navbar li {
   float: left;
   font-weight: bold;
+  font-size: 20px;
 }
 
 .navbar li a {
@@ -38,5 +35,31 @@ p {
 }
 
 .active {
+    background-color: #4CAF50;
+}
+
+.auth {
+    width: 50%;
+    margin: 5px;
+    padding: 5px;
+    border: solid;
+}
+
+.auth_group {
+    margin: 5px;
+    padding: 5px
+}
+
+.auth_label {
+    font-weight: bold;
+    font-size: 18px;
+    margin: 5px
+}
+
+.input_field {
+    margin: 5px;
+}
+
+.submit {
     background-color: #4CAF50;
 }
