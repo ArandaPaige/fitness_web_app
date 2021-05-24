@@ -8,8 +8,26 @@ p {
 
 .navbar {
     background-color: lightblue;
+    display: inline;
 }
 
-.navitem {
-    color: white;
+.navbar ul {
+  list-style-type: none;
+  margin: 1;
+  padding: 1;
+  overflow: hidden;
+
 }
+
+.navbar li {
+  float: left;
+}
+
+.navbar li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+

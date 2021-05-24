@@ -3,7 +3,7 @@ from fitness_web_app import app
 from fitness_web_app.model import RegistrationForm, LoginForm
 
 
-@app.route("/")
+@app.route("/", methods=['GET'])
 def home():
     return render_template('home.html', title='Home')
 
@@ -23,3 +23,8 @@ def register():
         flash(f'Account created for {form.username.data}.', 'success')
         return redirect(url_for('home'))
     return render_template('register.html', title='Register', form=form)
+
+
+@app.route("/about", methods=['GET'])
+def about():
+    return render_template('about.html', title='About')
