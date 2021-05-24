@@ -9,3 +9,5 @@ Werkzeug==1.0.1
 python-dotenv~=0.17.1
 pg8000~=1.19.4
 bcrypt~=3.2.0
+WTForms~=2.3.3
+email_validator=1.1.2
