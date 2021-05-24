@@ -16,11 +16,13 @@ p {
   margin: 1;
   padding: 1;
   overflow: hidden;
+  background-color: lightblue;
 
 }
 
 .navbar li {
   float: left;
+  font-weight: bold;
 }
 
 .navbar li a {
@@ -31,3 +33,10 @@ p {
     text-decoration: none;
 }
 
+.navbar li a:hover:not(.active) {
+    background-color: #111;
+}
+
+.active {
+    background-color: #4CAF50;
+}
