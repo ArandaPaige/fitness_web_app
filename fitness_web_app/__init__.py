@@ -15,3 +15,4 @@ app.config.update(
 )
 
 from fitness_web_app import routes
+from fitness_web_app import auth

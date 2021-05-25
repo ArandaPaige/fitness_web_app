@@ -5,6 +5,7 @@ header {
   font-weight: bold;
   font-size: 35px;
   text-align: center;
+  margin-right: 50px;
 }
 
 footer {
@@ -28,7 +29,7 @@ body {
   margin: 1;
   padding: 1;
   overflow: hidden;
-  background-color: teal;
+  background-color: #004d4d;
 
 }
 
@@ -55,7 +56,7 @@ body {
 }
 
 .auth {
-    background-color: teal;
+    background-color: #004d4d;
     width: 25%;
     margin: auto;
     border-style: solid;
