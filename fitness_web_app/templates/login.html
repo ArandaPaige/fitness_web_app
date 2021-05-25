@@ -14,11 +14,23 @@
                 <legend class="form_legend">Login</legend>
                 <div class="auth_group">
                     {{form.username.label(class="auth_label")}}
-                    {{form.username(class="input_field", placeholder="Your username")}}
+                    {% if form.username.errors %}
+                        {% for error in form.username.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    {% else %}
+                        {{form.username(class="input_field", placeholder="Your username")}}
+                    {% endif %}
                 </div>
                 <div class="auth_group">
                     {{form.password.label(class="auth_label")}}
-                    {{form.password(class="input_field", placeholder="Your password")}}
+                    {% if form.password.errors %}
+                        {% for error in form.password.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    {% else %}
+                        {{form.password(class="input_field", placeholder="Your password")}}
+                    {% endif %}
                 </div>
             </fieldset>
             <div>
