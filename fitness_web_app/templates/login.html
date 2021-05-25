@@ -10,8 +10,8 @@
     <div class="auth">
         <form method="POST" action="">
             {{ form.hidden_tag() }}
-            <fieldset class="register">
-                <legend style="font-weight:bold;font-size:20px">Login</legend>
+            <fieldset class="auth_field">
+                <legend class="form_legend">Login</legend>
                 <div class="auth_group">
                     {{form.username.label(class="auth_label")}}
                     {{form.username(class="input_field", placeholder="Your username")}}
