@@ -1,5 +1,5 @@
 header {
-  background-color: #f1f1f1;
+  background-color: #1a1a1a;
   color: white;
   padding: 20px;
   font-weight: bold;
@@ -8,15 +8,18 @@ header {
 }
 
 footer {
-    background-color: #f1f1f1;
+    background-color: #262626;
     color: white;
     font-weight:bold;
     font-size: 14px;
     text-align: right;
 }
 
+body {
+    background-color: #262626;
+}
+
 .navbar {
-    background-color: lightblue;
     display: inline;
 }
 
@@ -25,7 +28,7 @@ footer {
   margin: 1;
   padding: 1;
   overflow: hidden;
-  background-color: lightblue;
+  background-color: teal;
 
 }
 
@@ -52,27 +55,31 @@ footer {
 }
 
 .auth {
+    background-color: teal;
     width: 25%;
     margin: auto;
-    border: solid;
-
+    border-style: solid;
+    border-color: black;
 }
 
 .auth_field {
     width: 100%;
     border-radius: 2px;
-    padding: 1px;
     text-align: left;
+    border-style: solid;
+    border-bottom: none;
+    border-color: black;
 }
 
 .form_legend {
     display: block;
+    color: white;
     font-weight: bold;
     font-size: 20px;
-    background-color: lightblue;
-    padding:5px;
-    text-align: left;
+    background-color: #1a1a1a;
+    text-align: center;
     border-bottom: solid;
+    border-color: black;
 }
 
 .auth_group {
@@ -82,6 +89,7 @@ footer {
 
 .auth_label {
     font-weight: bold;
+    color: white;
     font-size: 18px;
     margin: 5px;
     display: block;
@@ -89,23 +97,28 @@ footer {
 
 .input_field {
     margin: 5px;
+    color: white;
+    border: solid;
+    border-color: black;
     min-width: 25%;
     max-width: 95%;
+    background-color: black;
 }
 
 .input_field:hover {
-    background-color: darkgrey;
+    background-color: #0d0d0d;
 }
 
 .submit {
     background-color: #4CAF50;
     font-size: 20px;
     padding: 5px;
-    font-color: white;
+    color: white;
     border-radius: 8px;
-    border: none;
+    border-style: solid;
+    border-color: #4CAF50;
     margin: 10px;
-    width: 25%
+    width: 25%;
 }
 
 .submit:hover {
