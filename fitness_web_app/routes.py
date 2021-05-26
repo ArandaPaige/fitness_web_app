@@ -1,6 +1,5 @@
 from flask import render_template, request, flash, redirect, url_for
 from fitness_web_app import app
-from fitness_web_app.model import RegistrationForm, LoginForm
 
 
 @app.route("/", methods=['GET'])
@@ -11,3 +10,11 @@ def home():
 @app.route("/about", methods=['GET'])
 def about():
     return render_template('about.html', title='About')
+
+
+@app.route("/user", methods=['GET'])
+def user():
+    user_auth = True
+    if not user_auth:
+        redirect('login')
+    return render_template('user.html', title='User')

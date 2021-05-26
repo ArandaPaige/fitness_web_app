@@ -2,6 +2,7 @@
 {% block title %} Home {% endblock %}
 {% block navlinks %}
     <li><a href="{{ url_for('home') }}">Home</a></li>
+    <li><a href="{{ url_for('user') }}">User</a></li>
     <li><a href="{{ url_for('about') }}">About</a></li>
     <li style="float:right"><a class='active' href="{{ url_for('login') }}">Login</a></li>
     <li style="float:right"><a href="{{ url_for('register') }}">Register</a></li>
@@ -35,6 +36,11 @@
             </fieldset>
             <div>
                 {{form.submit(class="submit")}}
+            </div>
+            <div>
+                <p style="display:inline;color:white;text-align:center;margin:10px;padding:5px">Don't have an account?
+                    <a style="color:white;" href="{{ url_for('register') }}"> Sign up!</a>
+                </p>
             </div>
         </form>
     </div>
