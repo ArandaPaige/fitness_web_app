@@ -56,7 +56,7 @@ def del_instance(obj_class, obj_ref):
     pass
 
 
-class User(db_class):
+class User(DBASE):
     """Define"""
 
     __tablename__ = 'users'
@@ -203,7 +203,7 @@ class User(db_class):
             return password
 
 
-class WeightEntry(db_class):
+class WeightEntry(DBASE):
     """Define"""
 
     __tablename__ = 'weight_history'

@@ -3,9 +3,7 @@ import logging
 from dotenv import dotenv_values
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
-from sqlalchemy.ext.declarative import declarative_base
-
-db_class = declarative_base()
+from fitness_web_app import DBASE
 
 logger = logging.getLogger(__name__)
 
@@ -13,8 +11,7 @@ logger = logging.getLogger(__name__)
 # ENGINE = create_engine(f"postgresql+pg8000://{USER}:{KEY_VAL}@{HOST}/{DB}", client_encoding='utf8')
 
 ENGINE = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
-DB_BASE = db_class
-DB_BASE.metadata.create_all(ENGINE)
+DBASE.metadata.create_all(ENGINE)
 
 
 def session_context_mgr(method):
