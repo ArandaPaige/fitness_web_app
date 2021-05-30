@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 # ENGINE = create_engine(f"postgresql+pg8000://{USER}:{KEY_VAL}@{HOST}/{DB}", client_encoding='utf8')
 
 ENGINE = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
-DBASE.metadata.create_all(ENGINE)
+# DBASE.metadata.create_all(ENGINE)
 
 
 def session_context_mgr(method):
