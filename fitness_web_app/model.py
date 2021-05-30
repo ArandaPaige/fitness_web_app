@@ -12,6 +12,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import Email, InputRequired, Length, EqualTo, ValidationError
 
 from fitness_web_app.database import *
+from fitness_web_app import login_manager
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +55,11 @@ def update_instance(obj_class, obj_ref, instance):
 
 def del_instance(obj_class, obj_ref):
     pass
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 class User(DBASE.Model):
@@ -419,9 +425,14 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Register')
 
     def validate_existing_user(form, field):
-        user = retrieve_user(field.username.data)
-        if user is not None:
+        user = User.query.filter_by(_username=field.data).first()
+        if user:
             raise ValidationError(f'{field.username.data} already exists. Please enter another username.')
+
+    def validate_existing_email(form, field):
+        email = User.query.filter_by(_email=field.data).first()
+        if email:
+            raise ValidationError(f'{email} already taken. Please enter another email.')
 
 
 class LoginForm(FlaskForm):
