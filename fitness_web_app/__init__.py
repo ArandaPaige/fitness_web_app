@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 from dotenv import load_dotenv
 from os import getenv
 from sqlalchemy.ext.declarative import declarative_base
@@ -18,6 +19,8 @@ app.config.update(
 )
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
 DBASE = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 from fitness_web_app import routes
 from fitness_web_app import auth
