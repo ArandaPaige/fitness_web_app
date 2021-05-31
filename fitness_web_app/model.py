@@ -425,7 +425,7 @@ class RegistrationForm(FlaskForm):
         'Email',
         validators=[
             InputRequired(),
-            Email()
+            Email(),
         ]
     )
     username = StringField(
@@ -479,3 +479,27 @@ class LoginForm(FlaskForm):
         user = retrieve_user(field.data)
         if user is None:
             raise ValidationError(f'{field.username.data} does not exist. Please enter another username.')
+
+
+class AccountSettingsForm(FlaskForm):
+    """Define"""
+
+    email = EmailField(
+        'Email',
+        validators=[
+            InputRequired(),
+            Email(),
+        ]
+    )
+    password = PasswordField(
+        'Password',
+        validators=[
+            InputRequired(),
+            Length(min=8, max=60),
+        ]
+    )
+
+    def validate_existing_email(form, field):
+        email = User.query.filter_by(_email=field.data).first()
+        if email:
+            raise ValidationError(f'{email} already taken. Please enter another email.')

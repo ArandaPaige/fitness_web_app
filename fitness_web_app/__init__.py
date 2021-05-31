@@ -32,4 +32,4 @@ if DATABASE_PATH.exists() is False:
 
 from fitness_web_app import home
 from fitness_web_app import auth
-from fitness_web_app import profile
+from fitness_web_app import userprofile
