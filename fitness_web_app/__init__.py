@@ -3,6 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from dotenv import load_dotenv
 from os import getenv
+from pathlib import Path
+
+BASE_DIR = Path().resolve()
+DATABASE = 'test.db'
+DATABASE_PATH = BASE_DIR / DATABASE
 
 app = Flask(__name__)
 
@@ -21,6 +26,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_message = 'You must log in before you can enter the user area.'
 login_manager.login_view = 'login'
+
+if DATABASE_PATH.exists() is False:
+    DBASE.create_all()
 
 from fitness_web_app import home
 from fitness_web_app import auth
