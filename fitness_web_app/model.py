@@ -5,7 +5,7 @@ from functools import reduce
 
 import bcrypt
 from flask_wtf import FlaskForm
-from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date
+from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date, Boolean
 from sqlalchemy.orm import relationship
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.fields.html5 import EmailField
@@ -73,6 +73,7 @@ class User(DBASE.Model):
     _password = Column(String(length=128), name='password')
     start_weight = Column(Float(precision=2), nullable=True)
     goal_weight = Column(Float(precision=2), nullable=True)
+    _active = Column(Boolean, name='active')
 
     weight_entries = relationship('WeightEntry', back_populates='user',
                                   cascade='all, delete',
@@ -130,6 +131,26 @@ class User(DBASE.Model):
         password = password.encode(encoding='utf-8')
         if bcrypt.checkpw(password, self._password):
             return True
+        else:
+            return False
+
+    @property
+    def is_active(self):
+        return self._active
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        try:
+            return str(self.id)
+        except:
+            logger.exception('ID could not be loaded.')
 
     @staticmethod
     def hash_password(password):
