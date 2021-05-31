@@ -4,9 +4,9 @@ from fitness_web_app.model import User
 from flask_login import login_required, current_user
 
 
-@app.route("/user", methods=['GET'])
+@app.route("/profile/", methods=['GET'])
 @login_required
-def user():
+def profile():
     if not current_user.is_authenticated:
         redirect(url_for('login'))
-    return render_template('user.html', title='User')
+    return render_template('profile.html', title='Profile')

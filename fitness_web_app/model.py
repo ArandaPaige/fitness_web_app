@@ -129,7 +129,7 @@ class User(DBASE.Model):
     def check_password_hash(self, password):
         password = password.encode(encoding='utf-8')
         if bcrypt.checkpw(password, self._password):
-            return 'Validated'
+            return True
 
     @staticmethod
     def hash_password(password):

@@ -11,9 +11,12 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(_username=form.username.data).first()
-        login_user(user, remember=False)
-        flash(f'{user.username} has successfully logged in!')
-        return redirect(url_for('home'))
+        if user.check_password_hash(form.password.data):
+            login_user(user, remember=True)
+            flash(f'{user.username} has successfully logged in!')
+            return redirect(url_for('home'))
+        else:
+            flash(f'Incorrect password. Please try again.')
     return render_template('login.html', title='Login', form=form)
 
 
@@ -26,7 +29,7 @@ def register():
         user = User(form.username.data, form.email.data, form.password.data)
         DBASE.session.add(user)
         DBASE.session.commit()
-        flash(f'Account created for {form.username.data}.', 'success')
+        flash(f'Account created for {user.username}.')
         return redirect(url_for('home'))
     return render_template('register.html', title='Register', form=form)
 

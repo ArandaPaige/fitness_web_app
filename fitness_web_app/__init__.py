@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from dotenv import load_dotenv
 from os import getenv
-from sqlalchemy.ext.declarative import declarative_base
 
 app = Flask(__name__)
 
@@ -14,13 +13,15 @@ app.config.update(
     {
         'DEBUG': True,
         'SECRET_KEY': SECRET_KEY,
-        'SQLALCHEMY_DATABASE_URI': "sqlite:///example.sqlite"
+        'SQLALCHEMY_DATABASE_URI': "sqlite:///test.db"
     }
 )
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
 DBASE = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_message = 'You must log in before you can enter the user area.'
+login_manager.login_view = 'login'
 
-from fitness_web_app import routes
+from fitness_web_app import home
 from fitness_web_app import auth
+from fitness_web_app import profile

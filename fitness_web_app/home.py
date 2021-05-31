@@ -10,11 +10,3 @@ def home():
 @app.route("/about", methods=['GET'])
 def about():
     return render_template('about.html', title='About')
-
-
-@app.route("/user", methods=['GET'])
-def user():
-    user_auth = True
-    if not user_auth:
-        redirect('login')
-    return render_template('user.html', title='User')
