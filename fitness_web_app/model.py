@@ -5,6 +5,7 @@ from functools import reduce
 
 import bcrypt
 from flask_wtf import FlaskForm
+from flask_login import UserMixin, AnonymousUserMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date, Boolean
 from sqlalchemy.orm import relationship
 from wtforms import StringField, PasswordField, SubmitField
@@ -62,7 +63,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class User(DBASE.Model):
+class User(DBASE.Model, UserMixin):
     """Define"""
 
     __tablename__ = 'users'
@@ -133,24 +134,6 @@ class User(DBASE.Model):
             return True
         else:
             return False
-
-    @property
-    def is_active(self):
-        return self._active
-
-    @property
-    def is_authenticated(self):
-        return True
-
-    @property
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        try:
-            return str(self.id)
-        except:
-            logger.exception('ID could not be loaded.')
 
     @staticmethod
     def hash_password(password):
@@ -228,6 +211,10 @@ class User(DBASE.Model):
             return errors
         else:
             return password
+
+
+class AnonUser(AnonymousUserMixin):
+    """Define"""
 
 
 class WeightEntry(DBASE.Model):

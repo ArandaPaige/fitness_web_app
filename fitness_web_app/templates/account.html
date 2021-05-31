@@ -1,11 +1,11 @@
-{% extends "base.html" %}
-{% block title %} About {% endblock %}
+{% extends 'base.html' %}
+{% block title %} Account Settings {% endblock %}
 {% block navlinks %}
     <li><a href="{{ url_for('home') }}">Home</a></li>
     <li><a href="{{ url_for('profile') }}">Profile</a></li>
-    <li><a class='active' href="{{ url_for('about') }}">About</a></li>
-   {% if current_user.is_authenticated %}
-        <li style="float:right"><a href="{{ url_for('account') }}">Account</a></li>
+    <li><a href="{{ url_for('about') }}">About</a></li>
+    {% if current_user.is_authenticated %}
+        <li style="float:right"><a class='active' href="{{ url_for('account') }}">Account</a></li>
         <li style="float:right"><a href="{{ url_for('logout') }}">Logout</a></li>
     {% else %}
         <li style="float:right"><a href="{{ url_for('login') }}">Login</a></li>
