@@ -13,7 +13,7 @@
     {% endif %}
 {% endblock %}
 {% block content %}
-    {% if current_user.is_anonymous %}
-        <p>Please go and log in</p>
+    {% if not current_user.is_authenticated %}
+        <p>To access this area, you must first</p><a href="{{ url_for('login') }}">log in</a>
     {% endif %}
 {% endblock %}

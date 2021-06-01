@@ -8,9 +8,9 @@ from flask_wtf import FlaskForm
 from flask_login import UserMixin, AnonymousUserMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date, Boolean
 from sqlalchemy.orm import relationship
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, DateField, DecimalField, IntegerField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import Email, InputRequired, Length, EqualTo, ValidationError
+from wtforms.validators import Email, InputRequired, Length, EqualTo, ValidationError, NumberRange
 
 from fitness_web_app.database import *
 from fitness_web_app import login_manager
@@ -486,7 +486,65 @@ class AccountSettingsForm(FlaskForm):
         ]
     )
 
+    submit = SubmitField('Submit Changes')
+
     def validate_existing_email(form, field):
         email = User.query.filter_by(_email=field.data).first()
         if email:
             raise ValidationError(f'{email} already taken. Please enter another email.')
+
+
+class WeightEntryForm(FlaskForm):
+    """Define"""
+
+    weight = DecimalField(
+        'Weight',
+        validators=[
+            InputRequired(),
+            NumberRange(min=0, max=2000, message='Value out of range. Please enter a value between 0-2000.')
+        ]
+    )
+
+    date = DateField(
+        'Date',
+        validators=[
+            InputRequired(),
+        ]
+    )
+    submit = SubmitField('Submit Entry')
+
+
+class SetEntryForm(FlaskForm):
+    """Define"""
+
+    lift = StringField(
+        'Lift',
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    weight = DecimalField(
+        'Weight',
+        validators=[
+            InputRequired(),
+            NumberRange(min=0, max=2000, message='Value out of range. Please enter a value between 0-2000.')
+        ]
+    )
+
+    reps = IntegerField(
+        'Reps',
+        validators=[
+            InputRequired(),
+            NumberRange(min=0, max=2000, message='Value out of range. Please enter a value between 0-2000.')
+        ]
+    )
+
+    date = DateField(
+        'Date',
+        validators=[
+            InputRequired(),
+        ]
+    )
+
+    submit = SubmitField('Submit Entry')

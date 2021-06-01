@@ -30,6 +30,7 @@ def register():
         DBASE.session.add(user)
         DBASE.session.commit()
         flash(f'Account created for {user.username}.')
+        login_user(user, remember=True)
         return redirect(url_for('home'))
     return render_template('register.html', title='Register', form=form)
 
