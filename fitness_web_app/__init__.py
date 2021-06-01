@@ -28,6 +28,7 @@ login_manager.login_message = 'You must log in before you can enter the user are
 login_manager.login_view = 'login'
 
 if DATABASE_PATH.exists() is False:
+    from fitness_web_app.model import User
     DBASE.create_all()
 
 from fitness_web_app import home
