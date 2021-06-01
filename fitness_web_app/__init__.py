@@ -24,7 +24,7 @@ app.config.update(
 DBASE = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_message = 'You must log in before you can enter the user area.'
+login_manager.login_message = 'You must log in before you can enter this area.'
 login_manager.login_view = 'login'
 
 if DATABASE_PATH.exists() is False:
