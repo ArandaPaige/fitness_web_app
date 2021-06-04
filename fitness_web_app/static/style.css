@@ -59,9 +59,8 @@ p {
 }
 
 .auth {
+    width: 100%
     background-color: #004d4d;
-    width: 25%;
-    margin: auto;
     border-style: solid;
     border-color: black;
 }
@@ -87,7 +86,6 @@ p {
 }
 
 .auth_group {
-    margin-left: 30px;
     padding: 1px
 }
 

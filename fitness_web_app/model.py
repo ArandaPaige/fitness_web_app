@@ -136,7 +136,7 @@ class User(DBASE.Model, UserMixin):
             return False
 
     @staticmethod
-    def hash_password(password):
+    def hash_password(password: bytes):
         hashed_pw = bcrypt.hashpw(password, bcrypt.gensalt())
         return hashed_pw
 
@@ -229,7 +229,7 @@ class WeightEntry(DBASE.Model):
 
     user = relationship("User", back_populates='weight_entries')
 
-    def __init__(self, user_id, weight, date=DATETODAY):
+    def __init__(self, user_id: int, weight: float, date=DATETODAY):
         self.user_id = user_id
         self.weight = weight
         self.date = date
@@ -262,9 +262,9 @@ class WeightEntry(DBASE.Model):
         return value
 
     @staticmethod
-    def sort(obj_list: list, key=lambda x: x[0], reverse=False):
+    def sort(objects: list, key=lambda x: x[0], reverse=False):
         """Sorts the list of objects by key, which defaults to date, in ascending order."""
-        sorted_list = sorted(obj_list, key=key, reverse=reverse)
+        sorted_list = sorted(objects, key=key, reverse=reverse)
         return sorted_list
 
     @staticmethod
@@ -314,8 +314,7 @@ class SetEntry(WeightEntry):
         'concrete': True
     }
 
-    def __init__(self, user_id, lift, weight, reps, rpe=None, date=DATETODAY):
-        super().__init__(weight, date)
+    def __init__(self, user_id: int, lift: str, weight: float, reps: int, rpe=None, date=DATETODAY):
         self.user_id = user_id
         self.lift = lift
         self.weight = weight
