@@ -9,7 +9,7 @@ BASE_DIR = Path().resolve()
 DATABASE = 'test.db'
 DATABASE_PATH = BASE_DIR / DATABASE
 
-app = Flask(__name__)
+app = Flask(__name__.split('.')[0])
 
 load_dotenv()
 SECRET_KEY = getenv('KEY')
