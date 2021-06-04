@@ -15,7 +15,7 @@
 {% block content %}
     <div class="container">
       <div class="row">
-        <div class="col">
+        <div class="col-sm-4">
             {% if current_user.is_authenticated %}
                 <div>
                     <p>Good day, {{ current_user.username }}</p>
@@ -26,10 +26,39 @@
                 </div>
             {% endif %}
         </div>
-        <div class="col">
-          <p>Hello there</p>
+        <div class="col-sm-4">
+          <div class="auth">
+              <form method="POST" action="">
+                  {{ form.hidden_tag() }}
+                  <fieldset class="auth_field">
+                    <div class="auth_group">
+                        {{form.weight.label(class="auth_label")}}
+                        {% if form.weight.errors %}
+                            {% for error in form.weight.errors %}
+                                <p style="float:right">{{ error }}</p>
+                            {% endfor %}
+                        {% else %}
+                            {{form.weight(class="input_field", placeholder="Your weight")}}
+                        {% endif %}
+                    </div>
+                    <div class="auth_group">
+                        {{form.date.label(class="auth_label")}}
+                        {% if form.date.errors %}
+                            {% for error in form.date.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        {% else %}
+                            {{form.date(class="input_field", placeholder="Enter a date or leave blank for today.")}}
+                        {% endif %}
+                    </div>
+                </fieldset>
+                <div>
+                    {{form.submit(class="submit")}}
+                </div>
+              </form>
+          </div>
         </div>
-        <div class="col">
+        <div class="col-sm-4">
           <p>Bye bye!</p>
         </div>
       </div>
