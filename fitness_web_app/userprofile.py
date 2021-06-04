@@ -15,7 +15,7 @@ def profile():
     return render_template('profile.html', title='Profile', form=form)
 
 
-@app.route("/profile/weight_history", methods=['GET'])
+@app.route("/profile/weight_history", methods=['POST', 'GET'])
 @login_required
 def weight_history():
     form = WeightEntryForm()
@@ -23,10 +23,10 @@ def weight_history():
         weight_entry = WeightEntry(current_user.id, form.weight.data, form.date.data)
         DBASE.add(weight_entry)
         DBASE.commit()
-    return render_template('profile.html', title='Profile')
+    return render_template('profile.html', title='Profile', form=form)
 
 
-@app.route("/profile/lifting_history", methods=['GET'])
+@app.route("/profile/lifting_history", methods=['POST', 'GET'])
 @login_required
 def lifting_history():
     form = SetEntryForm()
@@ -36,4 +36,4 @@ def lifting_history():
         )
         DBASE.add(set_entry)
         DBASE.commit()
-    return render_template('profile.html', title='Profile')
+    return render_template('profile.html', title='Profile', form=form)
