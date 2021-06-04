@@ -46,7 +46,7 @@ logging.config.dictConfig(LOG_CONFIG)
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
     app.run()
 
 

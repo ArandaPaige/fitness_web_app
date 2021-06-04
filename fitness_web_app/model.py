@@ -25,23 +25,23 @@ def deepgetattr(obj, attr):
     return reduce(getattr, attr.split('.'), obj)
 
 
-def retrieve_user(username):
+def retrieve_user(username: object) -> object:
     filter_args = {'_username': username}
     user = retrieve_object(User, filter_args)
     return user
 
 
-def create_user(username, email, password):
+def create_user(username: str, email: str, password: str) -> object:
     user = User(username, email, password)
     return user
 
 
-def new_weight_entry(user_id, weight, date=DATETODAY):
+def new_weight_entry(user_id: int, weight: float, date=DATETODAY) -> object:
     weight_entry = WeightEntry(user_id, weight, date)
     return weight_entry
 
 
-def new_lift_entry(user_id, lift, weight, reps, date=DATETODAY):
+def new_lift_entry(user_id: int, lift: str, weight: float, reps: int, date=DATETODAY) -> object:
     lift_entry = SetEntry(user_id, lift, weight, reps, date)
     return lift_entry
 
@@ -59,7 +59,7 @@ def del_instance(obj_class, obj_ref):
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id: int) -> object:
     return User.query.get(int(user_id))
 
 
@@ -85,7 +85,7 @@ class User(DBASE.Model, UserMixin):
                                passive_deletes=True
                                )
 
-    def __init__(self, username, email, password):
+    def __init__(self, username: str, email: str, password: str) -> None:
         self.username = username
         self.email = email
         self.password = password
@@ -101,7 +101,7 @@ class User(DBASE.Model, UserMixin):
         return self._username
 
     @username.setter
-    def username(self, username):
+    def username(self, username: str):
         value = self.validate_username(username)
         if username == value:
             self._username = value
@@ -111,7 +111,7 @@ class User(DBASE.Model, UserMixin):
         return self._email
 
     @email.setter
-    def email(self, email):
+    def email(self, email: str):
         value = self.validate_email(email)
         if email == value:
             self._email = value
@@ -121,14 +121,14 @@ class User(DBASE.Model, UserMixin):
         return self._password
 
     @password.setter
-    def password(self, password):
+    def password(self, password: str):
         value = self.validate_password(password)
         if password == value:
             value = value.encode(encoding='utf-8')
             hashed_pw = self.hash_password(value)
             self._password = hashed_pw
 
-    def check_password_hash(self, password):
+    def check_password_hash(self, password: str):
         password = password.encode(encoding='utf-8')
         if bcrypt.checkpw(password, self._password):
             return True
@@ -141,7 +141,7 @@ class User(DBASE.Model, UserMixin):
         return hashed_pw
 
     @staticmethod
-    def validate_username(username):
+    def validate_username(username: str):
         """Validates whether or not given username conforms to correct username parameters and either returns the
         username or a list of errors."""
         errors = []
@@ -262,19 +262,19 @@ class WeightEntry(DBASE.Model):
         return value
 
     @staticmethod
-    def sort(obj_list, key=lambda x: x[0], reverse=False):
+    def sort(obj_list: list, key=lambda x: x[0], reverse=False):
         """Sorts the list of objects by key, which defaults to date, in ascending order."""
         sorted_list = sorted(obj_list, key=key, reverse=reverse)
         return sorted_list
 
     @staticmethod
-    def calculate_net_change(start_val, end_val):
+    def calculate_net_change(start_val: object, end_val: object) -> float:
         """Subtracts end value from start value to determine net change and returns absolute float."""
         net_change = abs(getattr(start_val, 'weight') - getattr(end_val, 'weight'))
         return net_change
 
     @staticmethod
-    def calculate_delta(start_val, end_val, start_date, end_date):
+    def calculate_delta(start_val: object, end_val: object, start_date: object, end_date: object) -> float:
         """Calculates delta based on difference between starting value and end value and length of time between the
         starting date and end date. Returns a float."""
         time_delta = getattr(end_date, '_date') - getattr(start_date, '_date')
@@ -286,7 +286,7 @@ class WeightEntry(DBASE.Model):
         return delta
 
     @staticmethod
-    def calculate_time_to_goal(start_val, goal_val, delta):
+    def calculate_time_to_goal(start_val: object, goal_val: object, delta: int) -> tuple:
         """Calculates days until the goal value is reached and returns a tuple of days left and the date upon
         which the goal will be achieved."""
         days = abs((getattr(start_val, 'weight') - goal_val) / delta)
@@ -340,7 +340,7 @@ class SetEntry(WeightEntry):
         date_entry = DateEntry(date)
         self._date = getattr(date_entry, 'date')
 
-    def calculate_percentage_of_1_rep_max(self):
+    def calculate_percentage_of_1_rep_max(self) -> tuple:
         """Calculates one-rep max using Brzycki formula and returns tuple of one-rep max and percentage of
         one-rep max based on the set.
         """
@@ -348,26 +348,26 @@ class SetEntry(WeightEntry):
         percentage = (self.weight / one_rep_max) * 100
         return percentage, one_rep_max
 
-    def calculate_volume(self):
+    def calculate_volume(self) -> float:
         """Multiplies weight and reps to determine volume and returns an integer."""
         volume = self.weight * self.reps
         return volume
 
     @staticmethod
-    def average_rpe(sets):
+    def average_rpe(sets: list) -> float:
         """Averages RPE for tuple of set objects and returns a float."""
         average = (sum(getattr(set, 'rpe', 0) for set in sets)) / len(
             [set for set in sets if getattr(set, 'rpe') is not None])
         return average
 
     @staticmethod
-    def calculate_total_reps(sets):
+    def calculate_total_reps(sets: list) -> int:
         """Sums reps for tuple of set objects and returns an integer."""
         total_reps = sum(getattr(set, 'reps', 0) for set in sets)
         return total_reps
 
     @staticmethod
-    def calculate_total_volume(sets):
+    def calculate_total_volume(sets: list) -> int:
         """Sums volume for tuple of set objects and returns an integer."""
         total_volume = sum(getattr(set, 'volume', 0) for set in sets)
         return total_volume
