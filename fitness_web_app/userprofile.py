@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 
 
 @app.route("/profile/", methods=['GET'])
+@login_required
 def profile():
     form = WeightEntryForm()
     if form.validate_on_submit():
@@ -15,6 +16,7 @@ def profile():
 
 
 @app.route("/profile/weight_history", methods=['GET'])
+@login_required
 def weight_history():
     form = WeightEntryForm()
     if form.validate_on_submit():
@@ -25,6 +27,7 @@ def weight_history():
 
 
 @app.route("/profile/lifting_history", methods=['GET'])
+@login_required
 def lifting_history():
     form = SetEntryForm()
     if form.validate_on_submit():
