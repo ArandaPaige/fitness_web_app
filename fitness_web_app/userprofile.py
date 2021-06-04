@@ -23,7 +23,7 @@ def weight_history():
         weight_entry = WeightEntry(current_user.id, form.weight.data, form.date.data)
         DBASE.add(weight_entry)
         DBASE.commit()
-    return render_template('profile.html', title='Profile', form=form)
+    return render_template('weight_history.html', title='Profile', form=form)
 
 
 @app.route("/profile/lifting_history", methods=['POST', 'GET'])
@@ -36,4 +36,4 @@ def lifting_history():
         )
         DBASE.add(set_entry)
         DBASE.commit()
-    return render_template('profile.html', title='Profile', form=form)
+    return render_template('lifting_history.html', title='Profile', form=form)
