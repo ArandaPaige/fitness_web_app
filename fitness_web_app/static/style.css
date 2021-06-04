@@ -19,6 +19,10 @@ body {
     background-color: #262626;
 }
 
+p {
+    color: white;
+}
+
 .navbar {
     display: inline;
 }

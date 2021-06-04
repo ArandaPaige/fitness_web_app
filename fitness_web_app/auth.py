@@ -11,7 +11,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(_username=form.username.data).first()
-        if user.check_password_hash(form.password.data):
+        if user is None:
+            flash(f'{form.username} could not be found. Please enter another username.')
+        if user is not None and user.check_password_hash(form.password.data):
             login_user(user, remember=True)
             flash(f'{user.username} has successfully logged in!')
             return redirect(url_for('home'))
@@ -30,7 +32,7 @@ def register():
         DBASE.session.add(user)
         DBASE.session.commit()
         flash(f'Account created for {user.username}.')
-        login_user(user, remember=True)
+        login_user(user, remember=form.remember_me.data)
         return redirect(url_for('home'))
     return render_template('register.html', title='Register', form=form)
 
@@ -44,4 +46,5 @@ def account():
 @app.route('/logout')
 def logout():
     logout_user()
+    flash(f'You have been successfully logged out.')
     return redirect(url_for('home'))

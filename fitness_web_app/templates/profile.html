@@ -13,7 +13,25 @@
     {% endif %}
 {% endblock %}
 {% block content %}
-    {% if not current_user.is_authenticated %}
-        <p>To access this area, you must first</p><a href="{{ url_for('login') }}">log in</a>
-    {% endif %}
+    <div class="container">
+      <div class="row">
+        <div class="col">
+            {% if current_user.is_authenticated %}
+                <div>
+                    <p>Good day, {{ current_user.username }}</p>
+                </div>
+            {% else %}
+                <div>
+                    <p>To access this area, you must first<a style="display:inline" href="{{ url_for('login') }}">log in</a></p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col">
+          <p>Hello there</p>
+        </div>
+        <div class="col">
+          <p>Bye bye!</p>
+        </div>
+      </div>
+    </div>
 {% endblock %}

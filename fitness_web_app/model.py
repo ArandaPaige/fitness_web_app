@@ -8,7 +8,7 @@ from flask_wtf import FlaskForm
 from flask_login import UserMixin, AnonymousUserMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date, Boolean
 from sqlalchemy.orm import relationship
-from wtforms import StringField, PasswordField, SubmitField, DateField, DecimalField, IntegerField
+from wtforms import StringField, PasswordField, SubmitField, DateField, DecimalField, IntegerField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Email, InputRequired, Length, EqualTo, ValidationError, NumberRange
 
@@ -429,7 +429,7 @@ class RegistrationForm(FlaskForm):
             Length(min=8, max=60),
         ]
     )
-    confirm_password = PasswordField('Confirm Password', validators=[EqualTo('password')])
+    remember_me = BooleanField('Remember Me?', default='checked')
     submit = SubmitField('Register')
 
     def validate_existing_user(form, field):
@@ -460,6 +460,7 @@ class LoginForm(FlaskForm):
             Length(min=8, max=60),
         ]
     )
+    remember_me = BooleanField('Remember Me?', default='checked')
     submit = SubmitField('Log In')
 
     def validate_user_exists(form, field):
