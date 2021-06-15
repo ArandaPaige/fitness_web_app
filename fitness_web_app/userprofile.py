@@ -23,7 +23,10 @@ def profile():
 def weight_history():
     form = WeightEntryForm()
     if form.validate_on_submit():
-        weight_entry = WeightEntry(current_user.id, form.weight.data, form.date.data)
+        if form.date.data is None:
+            weight_entry = WeightEntry(current_user.id, form.weight.data)
+        else:
+            weight_entry = WeightEntry(current_user.id, form.weight.data, form.date.data)
         DBASE.session.add(weight_entry)
         DBASE.session.commit()
     return render_template('weight_history.html', title='Profile', form=form)
@@ -34,9 +37,14 @@ def weight_history():
 def lifting_history():
     form = SetEntryForm()
     if form.validate_on_submit():
-        set_entry = SetEntry(
-            current_user.id, form.lift.data, form.weight.data, form.reps.data, form.date.data, form.rpe.data
-        )
+        if form.date.data is None:
+            set_entry = SetEntry(
+                current_user.id, form.lift.data, form.weight.data, form.reps.data, form.rpe.data
+            )
+        else:
+            set_entry = SetEntry(
+                current_user.id, form.lift.data, form.weight.data, form.reps.data, form.rpe.data, form.date.data
+            )
         DBASE.session.add(set_entry)
         DBASE.session.commit()
     return render_template('lifting_history.html', title='Profile', form=form)

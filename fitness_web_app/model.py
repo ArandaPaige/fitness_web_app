@@ -540,10 +540,18 @@ class SetEntryForm(FlaskForm):
         ]
     )
 
+    rpe = DecimalField(
+        'RPE',
+        validators=[
+            Optional(),
+            NumberRange(min=0, max=2000, message='Value out of range. Please enter a value between 0-2000.')
+        ]
+    )
+
     date = DateField(
         'Date',
         validators=[
-            InputRequired(),
+            Optional(),
         ]
     )
 
