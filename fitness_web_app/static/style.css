@@ -29,8 +29,8 @@ p {
 
 .navbar ul {
   list-style-type: none;
-  margin: 1;
-  padding: 1;
+  margin: 1px;
+  padding: 1px;
   overflow: hidden;
   background-color: #004d4d;
 
@@ -59,7 +59,7 @@ p {
 }
 
 .auth {
-    width: 100%
+    margin: 5px;
     background-color: #004d4d;
     border-style: solid;
     border-color: black;

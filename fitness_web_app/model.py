@@ -10,7 +10,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date, Boolean
 from sqlalchemy.orm import relationship
 from wtforms import StringField, PasswordField, SubmitField, DateField, DecimalField, IntegerField, BooleanField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import Email, InputRequired, Length, EqualTo, ValidationError, NumberRange
+from wtforms.validators import Email, InputRequired, Length, EqualTo, ValidationError, NumberRange, Optional
 
 from fitness_web_app.database import *
 from fitness_web_app import login_manager
@@ -508,7 +508,7 @@ class WeightEntryForm(FlaskForm):
     date = DateField(
         'Date',
         validators=[
-            InputRequired(),
+            Optional(),
         ]
     )
     submit = SubmitField('Submit Entry')
