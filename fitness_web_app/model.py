@@ -85,6 +85,11 @@ class User(DBASE.Model, UserMixin):
                                passive_deletes=True
                                )
 
+    diet_history = relationship('Diet', back_populates='user',
+                                cascade='all, delete',
+                                passive_deletes=True
+                                )
+
     def __init__(self, username: str, email: str, password: str) -> None:
         self.username = username
         self.email = email
@@ -294,6 +299,22 @@ class WeightEntry(DBASE.Model):
         return days, end_date
 
 
+class Diet(DBASE.Model):
+    """Define"""
+
+    __tablename__ = 'diet_history'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"))
+    start_weight = Column(Float(precision=2), nullable=False)
+    goal_weight = Column(Float(precision=2), nullable=False)
+    end_weight = Column(Float(precision=2), nullable=True)
+    start_date = Column(Date, name='start_date', index=True, nullable=False)
+    end_date = Column(Date, name='end_date', nullable=True)
+
+    user = relationship("User", back_populates='diet_history')
+
+
 class SetEntry(WeightEntry):
     """Define"""
 
@@ -486,12 +507,32 @@ class AccountSettingsForm(FlaskForm):
         ]
     )
 
-    submit = SubmitField('Submit Changes')
+    submit = SubmitField('Update Account')
 
     def validate_existing_email(form, field):
         email = User.query.filter_by(_email=field.data).first()
         if email:
             raise ValidationError(f'{email} already taken. Please enter another email.')
+
+
+class DietEntryForm(FlaskForm):
+    """Define"""
+
+    start_weight = DecimalField(
+        'Start Weight',
+        validators=[
+            InputRequired(),
+            NumberRange(min=0, max=2000, message='Value out of range. Please enter a value between 0-2000.')
+        ]
+    )
+
+    goal_weight = DecimalField(
+        'Goal Weight',
+        validators=[
+            InputRequired(),
+            NumberRange(min=0, max=2000, message='Value out of range. Please enter a value between 0-2000.')
+        ]
+    )
 
 
 class WeightEntryForm(FlaskForm):
@@ -511,7 +552,7 @@ class WeightEntryForm(FlaskForm):
             Optional(),
         ]
     )
-    submit = SubmitField('Submit Entry')
+    submit = SubmitField('Add Weight Entry')
 
 
 class SetEntryForm(FlaskForm):
@@ -555,4 +596,4 @@ class SetEntryForm(FlaskForm):
         ]
     )
 
-    submit = SubmitField('Submit Entry')
+    submit = SubmitField('Add Lift Entry')

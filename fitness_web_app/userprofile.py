@@ -7,6 +7,7 @@ from flask_login import login_required, current_user
 @app.route("/profile/", methods=['POST', 'GET'])
 @login_required
 def profile():
+    weight_list = WeightEntry.query.filter_by(user_id=current_user.id).all()
     form = WeightEntryForm()
     if form.validate_on_submit():
         if form.date.data is None:
@@ -15,7 +16,7 @@ def profile():
             weight_entry = WeightEntry(current_user.id, form.weight.data, form.date.data)
         DBASE.session.add(weight_entry)
         DBASE.session.commit()
-    return render_template('profile.html', title='Profile', form=form)
+    return render_template('profile.html', title='Profile', form=form, weight_list=weight_list)
 
 
 @app.route("/profile/weight_history", methods=['POST', 'GET'])
