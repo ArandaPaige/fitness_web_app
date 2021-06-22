@@ -72,8 +72,6 @@ class User(DBASE.Model, UserMixin):
     _username = Column(String(length=60), name='username', unique=True, nullable=False)
     _email = Column(String(length=150, ), name='email', unique=True)
     _password = Column(String(length=128), name='password')
-    start_weight = Column(Float(precision=2), nullable=True)
-    goal_weight = Column(Float(precision=2), nullable=True)
     _active = Column(Boolean, name='active')
 
     weight_entries = relationship('WeightEntry', back_populates='user',
@@ -229,6 +227,7 @@ class WeightEntry(DBASE.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"))
+    diet_id = Column(Integer, ForeignKey('diet_history.id', ondelete="CASCADE"))
     _date = Column(Date, name='date', index=True, nullable=False)
     weight = Column(Float(precision=2), nullable=False)
 
