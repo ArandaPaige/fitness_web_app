@@ -233,6 +233,7 @@ class WeightEntry(DBASE.Model):
     weight = Column(Float(precision=2), nullable=False)
 
     user = relationship("User", back_populates='weight_entries')
+    diet = relationship("Diet", back_populates='Diet')
 
     def __init__(self, user_id: int, weight: float, date=DATETODAY):
         self.user_id = user_id
@@ -313,6 +314,9 @@ class Diet(DBASE.Model):
     end_date = Column(Date, name='end_date', nullable=True)
 
     user = relationship("User", back_populates='diet_history')
+    weight_entries = relationship('WeightEntry', back_populates='diet_history',
+                                  cascade='all, delete',
+                                  passive_deletes=True)
 
 
 class SetEntry(WeightEntry):
@@ -533,6 +537,36 @@ class DietEntryForm(FlaskForm):
             NumberRange(min=0, max=2000, message='Value out of range. Please enter a value between 0-2000.')
         ]
     )
+
+    date = DateField(
+        'Start Date',
+        validators=[
+            Optional(),
+        ]
+    )
+
+    submit = SubmitField('Start New Diet')
+
+
+class DietFinishForm(FlaskForm):
+    """Define"""
+
+    end_weight = DecimalField(
+        'Final Weight',
+        validators=[
+            InputRequired(),
+            NumberRange(min=0, max=2000, message='Value out of range. Please enter a value between 0-2000.')
+        ]
+    )
+
+    date = DateField(
+        'End Date',
+        validators=[
+            Optional(),
+        ]
+    )
+
+    submit = SubmitField('Finish Diet')
 
 
 class WeightEntryForm(FlaskForm):
