@@ -1,3 +1,21 @@
+.navbar-light {
+    background: #004d4d;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.navbar-light .navbar-nav .nav-link .hover {
+    color: blue;
+}
+
+.navbar-light .navbar-nav .nav-link .active {
+    color: teal;
+}
+
 header {
   background-color: #1a1a1a;
   color: white;
@@ -6,6 +24,7 @@ header {
   font-size: 35px;
   text-align: center;
 }
+
 
 footer {
     background-color: #262626;
