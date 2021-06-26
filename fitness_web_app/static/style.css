@@ -4,16 +4,17 @@
 
 .navbar-light .navbar-nav .nav-link {
     color: white;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
 }
 
-.navbar-light .navbar-nav .nav-link .hover {
-    color: blue;
+.hover {
+    background: darkgrey;
 }
 
-.navbar-light .navbar-nav .nav-link .active {
-    color: teal;
+.active {
+    background: grey;
+    color: white;
 }
 
 header {
