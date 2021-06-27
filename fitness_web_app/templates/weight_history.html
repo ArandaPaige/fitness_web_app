@@ -38,7 +38,13 @@
               <div class="accordion-item">
                 <h2 class="accordion-header" id="headingOne">
                   <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    Accordion Item #1
+                    <form method="POST" action="">
+                        {{ dietform.hidden_tag() }}
+                        <div class="mb-3">
+                            {{dietform.start_weight.label(class="form-label")}}
+                            {{dietform.start_weight(class="form-control", id="formGroupExampleInput", placeholder="Your starting weight")}}
+                        </div>
+                    </form>
                   </button>
                 </h2>
                 <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
